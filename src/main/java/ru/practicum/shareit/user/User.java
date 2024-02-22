@@ -10,14 +10,12 @@ import javax.validation.constraints.NotBlank;
  * TODO Sprint add-controllers.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class User {
 
-    private final int id;
+    private final long id;
 
     private final String name;
-    //еще надо сделать проверку на дубликат email
-    @Email
-    @NotBlank
+
     private final String email;
 }

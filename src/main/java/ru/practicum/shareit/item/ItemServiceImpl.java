@@ -20,7 +20,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public Item addItem(Item item, long userId) {
+    public ItemDto addItem(Item item, long userId) {
 
         userRepository.isUser(userId);
 

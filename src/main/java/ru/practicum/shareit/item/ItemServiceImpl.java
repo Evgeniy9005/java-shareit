@@ -18,17 +18,30 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final ItemMapper itemMapper;
 
     @Override
-    public ItemDto addItem(Item item, long userId) {
+    public ItemDto addItem(ItemDto itemDto, long userId) {
 
-        userRepository.isUser(userId);
+            userRepository.isUser(userId);
 
-            User user = userRepository.getUser(userId);
-            Item newItem = itemRepository.addItem(item.toBuilder().owner(user).build());
+            Item newItem = itemRepository.addItem(itemMapper.toItem(itemDto).toBuilder().owner(userId).build());
 
             log.info("Добавлена вещь {}",newItem);
 
-        return newItem;
+        return itemMapper.toItemDto(newItem);
     }
+
+    @Override
+    public ItemDto upItem(ItemDto itemDto, long itemId) {
+
+        itemRepository.isItem(itemId);
+
+        Item updateItem = itemRepository.upItem(itemMapper.toItem(itemDto).toBuilder().owner(userId).build());
+
+
+        return itemMapper.toItemDto(updateItem);
+    }
+
+
 }

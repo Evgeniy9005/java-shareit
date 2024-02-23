@@ -21,7 +21,7 @@ public class Item {
 
     private final boolean available;
 
-    private final User owner;
+    private final long owner;
 
     private final ItemRequest request;
 

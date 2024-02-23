@@ -9,28 +9,34 @@ import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * TODO Sprint add-controllers.
  */
-
+@Data
 @Builder(toBuilder = true)
 public class ItemDto {
+
     private final long id;
 
+    @NotBlank
     private final String name;
 
+    @NotBlank
     private final String description;
 
-    private final boolean available;
+    @NotNull
+    private final Boolean available;
 
-    private final User owner;
+    private final long owner;
 
     private final ItemRequest request;
 
-    public Item toUser() {
+    /*public Item toUser() {
 
         return Item.builder()
                 .id(this.id)
@@ -52,5 +58,5 @@ public class ItemDto {
                 .owner(item.getOwner())
                 .request(item.getRequest())
                 .build();
-    }
+    }*/
 }

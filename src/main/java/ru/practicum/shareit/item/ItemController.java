@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import com.github.fge.jsonpatch.JsonPatch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -22,5 +23,12 @@ public class ItemController {
     public ItemDto addItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
 
         return itemService.addItem(itemDto,userId);
+    }
+
+    @PatchMapping
+    public ItemDto upItem(@RequestBody @Valid JsonPatch jsonPatch, @PathVariable Long itemId) {
+
+
+        return ItemDto.builder().build();
     }
 }

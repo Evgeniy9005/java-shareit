@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handle(final NotFoundException e) {
@@ -28,11 +27,19 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(final BadRequestException e) {
+        return new ErrorResponse(
+                e.getClass().getName(), e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(final RuntimeException e) {
 
         return new ErrorResponse(
-                e.getClass().getName(), "Произошла непредвиденная ошибка!"
+                e.toString(), "Произошла непредвиденная ошибка!"
         );
     }
 }

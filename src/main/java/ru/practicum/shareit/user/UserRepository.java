@@ -9,7 +9,7 @@ import java.util.*;
 @Repository
 public class UserRepository {
     private final Map<Long, User> users = new HashMap<>();
-    private Map<String ,Long> emails = new HashMap<>();
+    private Map<String, Long> emails = new HashMap<>();
 
     private int generationId = 0;
 
@@ -38,11 +38,11 @@ public class UserRepository {
 
         User oldUser = users.get(id);
 
-        if(name == null ) {
+        if (name == null) {
             name = oldUser.getName();
         }
 
-        if(email == null)  {
+        if (email == null)  {
             email = oldUser.getEmail();
         }
 
@@ -77,21 +77,18 @@ public class UserRepository {
 
     public boolean isUser(long userId) {
 
-        if(!users.containsKey(userId)) {
+        if (!users.containsKey(userId)) {
             throw new NotFoundException(String.format("Пользователь под id = %s не найден!",userId));
         }
 
         return true;
     }
 
-    private void valid(long userId, String email){
-
-        if(emails.containsKey(email)) {
-            if(emails.get(email) != userId) {
+    private void valid(long userId, String email) {
+        if (emails.containsKey(email)) {
+            if (emails.get(email) != userId) {
                 throw new ValidException(String.format("Пользователь с таким адресом %s уже есть!",email));
             }
         }
-
     }
-
 }

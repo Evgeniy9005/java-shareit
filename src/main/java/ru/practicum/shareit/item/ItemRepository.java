@@ -34,7 +34,7 @@ public class ItemRepository {
 
         Item newItem = item.toBuilder().id(itemId).build();
 
-        if(userAndItems.containsKey(userId)) {
+        if (userAndItems.containsKey(userId)) {
         userAndItems.get(userId).put(itemId,newItem);
         } else {
             Map<Long, Item> itemMap = new HashMap<>();
@@ -74,7 +74,7 @@ public class ItemRepository {
 
         Map<Long,Item> allItems = getAllItems();
 
-        if(!allItems.containsKey(itemId)) {
+        if (!allItems.containsKey(itemId)) {
             throw new NotFoundException(String.format("Не найдена вещь под id = %s",itemId));
         }
 

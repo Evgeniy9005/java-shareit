@@ -16,32 +16,54 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper;
+
     @Override
     public UserDto addUser(UserDto userDto) {
 
-        return UserDto.toUserDto(userRepository.addUser(userDto.toUser()));
+        UserDto addUserDto = userMapper.toUserDto(userRepository.addUser(userMapper.toUser(userDto)));
+
+        log.info("Добавлен пользователь {}", addUserDto);
+
+        return addUserDto;
     }
 
     @Override
     public UserDto upUser(UserDto userDto, long userId) {
-        User user = userDto.toUser().toBuilder().id(userId).build();
-        return UserDto.toUserDto(userRepository.upUser(user));
+
+        UserDto upUserDto = userMapper.toUserDto(
+                userRepository.upUser(
+                        userMapper.toUser(userDto).toBuilder().id(userId).build()
+                ));
+
+        log.info("Обновлен пользователь {}", upUserDto);
+
+        return upUserDto;
     }
 
     @Override
     public void deleteUser(long userId) {
+
+        log.info("Удален пользователь {}", userId);
+
         userRepository.deleteUser(userId);
     }
 
     @Override
     public UserDto getUser(long userId) {
-        return UserDto.toUserDto(userRepository.getUser(userId));
+
+        log.info("Возвращается пользователь {}", userId);
+
+        return userMapper.toUserDto(userRepository.getUser(userId));
     }
 
     @Override
     public Collection<UserDto> getUsers() {
+
+        log.info("Возвращаются все пользователи");
+
         return userRepository.getUsers().stream()
-                .map(user -> UserDto.toUserDto(user))
+                .map(user -> userMapper.toUserDto(user))
                 .collect(Collectors.toList());
     }
 

@@ -52,17 +52,25 @@ public class ItemServiceImpl implements ItemService {
 
         Item updateItem = itemRepository.upItem(itemMapper.toItem(itemDto).toBuilder().build());
 
+        log.info("Обновлена вещь {}",updateItem);
+
         return itemMapper.toItemDto(updateItem);
     }
 
     @Override
     public ItemDto getItem(long itemId, long userId) {
 
+        log.info("Вернуть вещь {}, пользователь {}", itemId, userId);
+
         return itemMapper.toItemDto(itemRepository.getItem(itemId, userId));
     }
 
     @Override
     public Collection<ItemDto> getItemsByUserId(long userId) {
+
+        log.info("Вернуть все вещи пользователя {}", userId);
+
+        userRepository.isUser(userId);
 
         return itemRepository.getItemsByUserId(userId).stream()
                 .map(item -> itemMapper.toItemDto(item))
@@ -71,17 +79,26 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemByRequestUsers(long itemId, long userIdMakesRequest) {
-        return itemMapper.toItemDto(itemRepository.getItemByRequestUsers(itemId,userIdMakesRequest));
+
+        log.info("Вернуть вещь {} по запросу пользователя {}", itemId, userIdMakesRequest);
+
+        userRepository.isUser(userIdMakesRequest);
+
+        return itemMapper.toItemDto(itemRepository.getItemByRequestUsers(itemId));
     }
 
     @Override
     public Collection<ItemDto> search(String text, long userId) {
 
+        log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
+
+        userRepository.isUser(userId);
+
         if (text.isBlank()) {
         return new ArrayList<>(0);
         }
 
-        return itemRepository.search(text,userId).stream()
+        return itemRepository.search(text).stream()
                 .map(item -> itemMapper.toItemDto(item))
                 .collect(Collectors.toSet());
     }

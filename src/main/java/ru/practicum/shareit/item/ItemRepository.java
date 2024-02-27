@@ -1,10 +1,8 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,23 +10,13 @@ import java.util.stream.Collectors;
 @Repository
 public class ItemRepository {
 
-    private final UserRepository userRepository;
-
     private final Map<Long, Map<Long, Item>> userAndItems = new HashMap<>();
 
     private long generationId = 0;
 
-    @Autowired
-    public ItemRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-
     public Item addItem(Item item) {
 
         long userId = item.getOwner();
-
-        userRepository.isUser(userId);
 
         long itemId = ++generationId;
 
@@ -49,8 +37,6 @@ public class ItemRepository {
         long itemId = item.getId();
         long userId = item.getOwner();
 
-        userRepository.isUser(userId);
-
         if (userAndItems.get(userId).containsKey(itemId)) {
             userAndItems.get(userId).remove(itemId);
             userAndItems.get(userId).put(itemId, item);
@@ -69,8 +55,7 @@ public class ItemRepository {
         return userAndItems.get(userId).get(itemId);
     }
 
-    public Item getItemByRequestUsers(long itemId, long userIdMakesRequest) {
-        userRepository.isUser(userIdMakesRequest);
+    public Item getItemByRequestUsers(long itemId) {
 
         Map<Long,Item> allItems = getAllItems();
 
@@ -81,9 +66,8 @@ public class ItemRepository {
         return  allItems.get(itemId);
     }
 
-
     public Collection<Item> getItemsByUserId(long userId) {
-        userRepository.isUser(userId);
+
 
         if (!userAndItems.containsKey(userId)) {
             throw new NotFoundException(String.format("У пользователя под id = %s нет добавленных вещей ", userId));
@@ -93,8 +77,6 @@ public class ItemRepository {
     }
 
     public boolean isItem(long itemId, long userId) {
-
-        userRepository.isUser(userId);
 
         if (!userAndItems.containsKey(userId)) {
             throw new NotFoundException(String.format("У пользователя под id = %s нет добавленных вещей ",userId));
@@ -109,8 +91,7 @@ public class ItemRepository {
         return true;
     }
 
-    public Collection<Item> search(String text, long userId) {
-        userRepository.isUser(userId);
+    public Collection<Item> search(String text) {
 
         return getAllItems().values().stream()
                 .filter(Item::isAvailable)

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,26 +17,26 @@ public class ItemRepository {
 
     public Item addItem(Item item) {
 
-        long userId = item.getOwner();
+        User user = item.getOwner();
 
         long itemId = ++generationId;
 
-        Item newItem = item.toBuilder().id(itemId).build();
+        Item newItem = item;
 
-        if (userAndItems.containsKey(userId)) {
-        userAndItems.get(userId).put(itemId,newItem);
+        if (userAndItems.containsKey(user)) {
+        userAndItems.get(user).put(itemId,newItem);
         } else {
             Map<Long, Item> itemMap = new HashMap<>();
             itemMap.put(itemId, newItem);
-            userAndItems.put(userId,itemMap);
+           // userAndItems.put(user,itemMap);
         }
 
-        return userAndItems.get(userId).get(itemId);
+        return userAndItems.get(user).get(itemId);
     }
 
     public Item upItem(Item item) {
-        long itemId = item.getId();
-        long userId = item.getOwner();
+       /* long itemId = item.getId();
+        //long userId = item.getOwner();
 
         if (userAndItems.get(userId).containsKey(itemId)) {
             userAndItems.get(userId).remove(itemId);
@@ -43,9 +44,9 @@ public class ItemRepository {
 
         } else {
             throw new NotFoundException("При обновлении не найдена вещь под id = " + itemId);
-        }
+        }*/
 
-        return userAndItems.get(userId).get(itemId);
+        return null;//userAndItems.get(userId).get(itemId);
     }
 
     public Item getItem(long itemId, long userId) {

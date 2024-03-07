@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dao.ItemDao;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.dao.UserDao;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,15 +20,19 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+
     private final ItemMapper itemMapper;
+
+    private final ItemDao itemDao;
+
+    private final UserDao userDao;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long userId) {
 
-        userRepository.isUser(userId);
-
-        Item newItem = itemRepository.addItem(itemMapper.toItem(itemDto).toBuilder().owner(userId).build());
+        Item newItem = itemDao.save(
+                itemMapper.toItem(itemDto.toBuilder().owner(userDao.getById(userId)).build())
+        );
 
         log.info("Добавлена вещь {}",newItem);
 
@@ -42,15 +46,14 @@ public class ItemServiceImpl implements ItemService {
             throw new BadRequestException("Не коректный id пользователя = " + userId);
         }
 
-        if (itemDto.getOwner() != userId) {
+       /* if (itemDto.getOwner() != userId) {
             throw new NotFoundException("Не владелец этой вещи пользователь под id " + userId);
-        }
+        }*/
 
-        userRepository.isUser(userId);
 
         itemRepository.isItem(itemId, userId);
 
-        Item updateItem = itemRepository.upItem(itemMapper.toItem(itemDto).toBuilder().build());
+        Item updateItem = itemRepository.upItem(itemMapper.toItem(itemDto));
 
         log.info("Обновлена вещь {}",updateItem);
 
@@ -70,8 +73,6 @@ public class ItemServiceImpl implements ItemService {
 
         log.info("Вернуть все вещи пользователя {}", userId);
 
-        userRepository.isUser(userId);
-
         return itemRepository.getItemsByUserId(userId).stream()
                 .map(item -> itemMapper.toItemDto(item))
                 .collect(Collectors.toSet());
@@ -82,8 +83,6 @@ public class ItemServiceImpl implements ItemService {
 
         log.info("Вернуть вещь {} по запросу пользователя {}", itemId, userIdMakesRequest);
 
-        userRepository.isUser(userIdMakesRequest);
-
         return itemMapper.toItemDto(itemRepository.getItemByRequestUsers(itemId));
     }
 
@@ -91,8 +90,6 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemDto> search(String text, long userId) {
 
         log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
-
-        userRepository.isUser(userId);
 
         if (text.isBlank()) {
         return new ArrayList<>(0);

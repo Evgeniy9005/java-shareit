@@ -1,11 +1,25 @@
-package ru.practicum.shareit.util;
+package ru.practicum.shareit.patch;
 
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
 
 public class Patch {
+
+
+    @Valid
+    public static UserDto patchUserDto(UserDto updated, UserDto patch) {
+        Long id = patch.getId();
+        String name = patch.getName();
+        String email = patch.getEmail();
+        return updated.builder()
+                .id(id == null ? updated.getId() : id)
+                .name(name == null ? updated.getName() : name)
+                .email(email == null ? updated.getEmail() : email)
+                .build();
+    }
 
     @Valid
     public static ItemDto patchItemDto(ItemDto updated, ItemDto patch) {
@@ -13,8 +27,8 @@ public class Patch {
        String name = patch.getName();
        String description = patch.getDescription();
        Boolean available = patch.getAvailable();
-       Long owner = patch.getOwner();
-       ItemRequest request = patch.getRequest();
+       User owner = patch.getOwner();
+       Long request = patch.getRequest();
        return updated.builder()
                .id(id == null ? updated.getId() : id)
                .name(name == null ? updated.getName() : name)

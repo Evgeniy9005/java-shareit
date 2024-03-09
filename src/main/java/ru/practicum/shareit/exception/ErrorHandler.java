@@ -37,12 +37,13 @@ public class ErrorHandler {
         );
     }
 
-   /* @ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handle(final RuntimeException e) {
+        e.printStackTrace();
         log.debug("Получен статус 500 internal server error {}",e.getMessage(),e);
         return new ErrorResponse(
                 e.toString(), "Произошла непредвиденная ошибка!"
         );
-    }*/
+    }
 }

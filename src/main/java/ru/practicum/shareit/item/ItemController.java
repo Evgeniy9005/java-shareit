@@ -16,9 +16,8 @@ public class ItemController {
 
     @PostMapping
     public ItemDto addItem(@RequestBody @Valid ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
-        ItemDto addItem = itemService.addItem(itemDto,userId);
-        System.out.println("?????????????? "+ addItem);
-        return addItem;
+
+        return itemService.addItem(itemDto,userId);
     }
 
     @PatchMapping(path = "/{itemId}")
@@ -26,7 +25,7 @@ public class ItemController {
                           @PathVariable Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
-
+        System.out.println("____----____----" + itemDto);
        return itemService.upItem(
                 Patch.patchItemDto(itemService.getItem(itemId, userId), itemDto),
                 itemId,

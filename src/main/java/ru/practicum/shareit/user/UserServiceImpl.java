@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.patch.Patch;
-import ru.practicum.shareit.user.dao.UserDao;
+import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.util.Collection;
@@ -20,12 +20,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     @Override
     public UserDto addUser(UserDto userDto) {
 
-        User user = userDao.save(userMapper.toUser(userDto));
+        User user = userRepository.save(userMapper.toUser(userDto));
 
         UserDto addUserDto = userMapper.toUserDto(user);
 
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
         upUser.setId(userId);
 
-        UserDto upUserDto = userMapper.toUserDto(userDao.save(upUser));
+        UserDto upUserDto = userMapper.toUserDto(userRepository.save(upUser));
 
         log.info("Обновлен пользователь {}", upUserDto);
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(long userId) {
 
-        userDao.deleteById(userId);
+        userRepository.deleteById(userId);
         log.info("Удален пользователь {}", userId);
 
     }
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getUser(long userId) {
 
-        User user = userDao.findById(userId).orElseThrow(
+        User user = userRepository.findById(userId).orElseThrow(
                 ()-> new NotFoundException("Не найден пользователь под id = "+userId)
         );
 
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
 
         Sort sortById = Sort.by(Sort.Direction.ASC,"id");
 
-        Collection<UserDto> set = userDao.findAll(sortById).stream()
+        Collection<UserDto> set = userRepository.findAll(sortById).stream()
                 .map(user -> userMapper.toUserDto(user))
                 .collect(Collectors.toList());
 
@@ -83,5 +83,6 @@ public class UserServiceImpl implements UserService {
 
         return set;
     }
+
 
 }

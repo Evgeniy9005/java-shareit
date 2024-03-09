@@ -16,12 +16,12 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-@Configuration
-@EnableTransactionManagement
-@EnableJpaRepositories(basePackages = "ru.practicum")
-@PropertySource(value = "classpath:application.properties")
+//@Configuration
+//@EnableTransactionManagement
+//@EnableJpaRepositories(basePackages = "ru.practicum")
+//@PropertySource(value = "classpath:application.properties")
 public class PersistenceConfig {
-    private final Environment environment;
+   /* private final Environment environment;
 
     public PersistenceConfig(Environment environment) {
         this.environment = environment;
@@ -30,12 +30,12 @@ public class PersistenceConfig {
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        /*properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
+        *//*properties.put("hibernate.dialect", environment.getRequiredProperty("hibernate.dialect"));
         properties.put("hibernate.show_sql", environment.getProperty("hibernate.show_sql", "false"));
         properties.put("javax.persistence.schema-generation.database.action",
                 environment.getProperty("javax.persistence.schema-generation.database.action", "none"));
         properties.put("javax.persistence.schema-generation.create-script-source",
-                environment.getProperty("javax.persistence.schema-generation.create-script-source"));*/
+                environment.getProperty("javax.persistence.schema-generation.create-script-source"));*//*
 
         //настройка диалекта на БД
         properties.put("spring.jpa.properties.hibernate.dialect",
@@ -53,13 +53,13 @@ public class PersistenceConfig {
         properties.put("spring.sql.init.mode",
                 environment.getProperty("spring.sql.init.mode","never"));
 
-       /* //
+       *//* //
         properties.put("spring.sql.init.schema-locations",
                 environment.getProperty("spring.sql.init.schema-locations"));
 
         //
         properties.put("spring.sql.init.data-locations",
-                environment.getProperty("spring.sql.init.data-locations"));*/
+                environment.getProperty("spring.sql.init.data-locations"));*//*
 
         //
         properties.put("logging.level.org.springframework.orm.jpa",
@@ -120,5 +120,5 @@ public class PersistenceConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;
-    }
+    }*/
 }

@@ -1,4 +1,4 @@
 package ru.practicum.shareit.booking.dao;
 
-public interface BookingDao {
+public interface BookingRepository {
 }

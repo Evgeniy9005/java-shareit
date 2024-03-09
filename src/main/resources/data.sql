@@ -4,11 +4,11 @@ DELETE FROM ITEMS;
 ALTER TABLE ITEMS ALTER COLUMN ID RESTART WITH 1;
 DELETE FROM BOOKINGS;
 ALTER TABLE BOOKINGS ALTER COLUMN ID RESTART WITH 1;
-DELETE FROM STATUS;
-INSERT INTO STATUS (id,code) values (1,'WAITING'); -- новое бронирование, ожидает одобрения
-INSERT INTO STATUS (id,code) values (2,'APPROVED'); -- бронирование подтверждено владельцем
-INSERT INTO STATUS (id,code) values (3,'REJECTED'); -- бронирование отклонено владельцем
-INSERT INTO STATUS (id,code) values (4,'CANCELED'); -- бронирование отменено создателем
+--DELETE FROM STATUS;
+--INSERT INTO STATUS (id,code) values (1,'WAITING'); -- новое бронирование, ожидает одобрения
+--INSERT INTO STATUS (id,code) values (2,'APPROVED'); -- бронирование подтверждено владельцем
+--INSERT INTO STATUS (id,code) values (3,'REJECTED'); -- бронирование отклонено владельцем
+--INSERT INTO STATUS (id,code) values (4,'CANCELED'); -- бронирование отменено создателем
 
 
 --ALTER TABLE USERS COLUMN ID RESTART SET START 1;

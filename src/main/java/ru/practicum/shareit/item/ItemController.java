@@ -25,7 +25,7 @@ public class ItemController {
                           @PathVariable Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
-        System.out.println("____----____----" + itemDto);
+
        return itemService.upItem(
                 Patch.patchItemDto(itemService.getItem(itemId, userId), itemDto),
                 itemId,

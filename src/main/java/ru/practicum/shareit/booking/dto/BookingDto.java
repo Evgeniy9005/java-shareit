@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-bookings.
@@ -17,9 +18,9 @@ public class BookingDto {
 
     private final int id;
 
-    private final LocalDate start;
+    private final LocalDateTime start;
 
-    private final LocalDate end;
+    private final LocalDateTime end;
 
     private final Item item;
 

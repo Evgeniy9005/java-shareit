@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.booking.IndicatorBooking;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -13,6 +16,7 @@ import ru.practicum.shareit.user.dao.UserRepository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,15 +28,16 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
 
-    private final UserRepository userDao;
+    private final UserRepository userRepository;
 
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long userId) {
 
         Item newItem = itemRepository.save(
                 itemMapper.toItem(itemDto.toBuilder().owner(
-                        userDao.findById(userId).orElseThrow(
+                        userRepository.findById(userId).orElseThrow(
                                 ()-> new NotFoundException(
                                         "при добовлении вещи не найден пользователь под id = " + userId))
                 ).build())
@@ -70,6 +75,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(()-> new NotFoundException("Не найдена вещь под id = " + itemId));
 
+
+
         log.info("Вернулась вещь {}, пользователя {}", item, userId);
 
         return itemMapper.toItemDto(item);
@@ -81,14 +88,28 @@ public class ItemServiceImpl implements ItemService {
         log.info("Вернуть все вещи пользователя {}", userId);
 
         return itemRepository.findByOwnerId(userId).stream()
-                .map(item -> itemMapper.toItemDto(item))
+                .map(item -> {
+                    List<Booking> bookingsList = bookingRepository
+                            .findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId);
+
+                    log.info("При возврате всех вещей пользователя. " +
+                            "Бронирования предэдущий и следующий, всего штук {}!", bookingsList.size());
+
+                    if(bookingsList.size() > 0) {
+                        return itemMapper.toItemDto(item).toBuilder()
+                                .lastBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(0)))
+                                .nextBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(1)))
+                                .build();
+                    }
+                return  itemMapper.toItemDto(item);
+                })
                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto getItemByRequestUsers(long itemId, long userIdMakesRequest) {
 
-        if (!userDao.existsById(userIdMakesRequest)) {
+        if (!userRepository.existsById(userIdMakesRequest)) {
            throw new NotFoundException(
                    "Не найден пользователь # при запросе вещи # пользователем #",
                    userIdMakesRequest,
@@ -97,9 +118,22 @@ public class ItemServiceImpl implements ItemService {
            );
         }
 
+
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new NotFoundException("Не найдена вешь под id = " + itemId)
         );
+
+        List<Booking> bookingsList = bookingRepository
+                .findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest);
+
+        log.info("Бронирования предэдущий и следующий, всего штук {}", bookingsList.size());
+
+        if(bookingsList.size() > 0) {
+            return itemMapper.toItemDto(item).toBuilder()
+                    .lastBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(0)))
+                    .nextBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(1)))
+                    .build();
+        }
 
         log.info("Вернулась вещь {} по запросу пользователя {}", item, userIdMakesRequest);
 

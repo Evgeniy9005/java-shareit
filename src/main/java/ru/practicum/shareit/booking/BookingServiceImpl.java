@@ -25,6 +25,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
+//@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -33,8 +34,6 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemRepository itemRepository;
 
-    private final BookingMapper mapper;
-
     @Override
     public Booking addBooking(CreateBooking createBooking, Long userId) {
 
@@ -42,6 +41,10 @@ public class BookingServiceImpl implements BookingService {
 
     Item item = itemRepository.findById(createBooking.getItemId())
             .orElseThrow(()-> new NotFoundException("Не найдена, при бронировании вещь!"));
+
+    if (item.getOwner().getId() == userId) {
+        throw new NotFoundException("Не может владелец вещи создать бронь на свою вещь!");
+    }
 
         if (!item.isAvailable()) {
             throw new BadRequestException("Вещь # уже забронированна!",createBooking.getItemId());
@@ -84,6 +87,11 @@ public class BookingServiceImpl implements BookingService {
 
         if (owner == userId) { //если userId владелец вещи
             if (approved) { //и approved = true
+                if (booking.getStatus().equals(Status.APPROVED)) {
+                    throw new BadRequestException(
+                            "Бронирование вещи # уже подтвеждено владельцем #!",booking.getItem().getId(),owner
+                    );
+                }
                setStatusBooking = booking.toBuilder().status(Status.APPROVED).build();//подтверждение бронирования влаельцем вещи
             } else { //и approved = false
                setStatusBooking = booking.toBuilder().status(Status.REJECTED).build();//отклонение бронирования влаельцем вещи
@@ -129,18 +137,6 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
 
-
-    /*public Collection<Booking> getBookingsForUser(long userId) {//для ползователя
-        if(!userRepository.existsById(userId)) {
-            throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
-        }
-
-        List<Booking> bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC,"id"));
-
-        log.info("Вернулись брони вещей в количестве = {}",bookingList.size());
-
-        return bookingList;
-    }*/
 
     @Override
     public Collection<Booking> getBookingsForUser(long userId, String state) {//для ползователя
@@ -207,6 +203,7 @@ public class BookingServiceImpl implements BookingService {
 
         }
     }
+
 
     private void validDate(CreateBooking createBooking) {
         LocalDateTime start = createBooking.getStart();

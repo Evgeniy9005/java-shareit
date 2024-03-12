@@ -78,13 +78,4 @@ public class BookingController {
 
     }
 
-    /*@GetMapping("/owner")
-    Collection<BookingDto> getBookingsOwnerState(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestParam String state
-    ) {
-        return bookingService.getBookingsState(userId,state).stream()
-                .map(booking -> mapper.toBookingDto(booking))
-                .collect(Collectors.toList());
-    }*/
-
 }

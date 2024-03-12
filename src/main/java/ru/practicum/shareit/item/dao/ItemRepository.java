@@ -18,7 +18,8 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
     @Query("select i from Item i where lower(i.description) like lower(%?1%)")*/
     List<Item> searchByIgnoreCaseDescriptionContainingAndAvailableTrue(String text);
 
-    //
-    Optional<Item> findByIdAndAvailableTrue(long userId);
+   /* List<Item> findByItemJoinBooking(long itemId, long ownerId);
+
+    Optional<Item> findByIdAndAvailableTrue(long userId);*/
 
 }

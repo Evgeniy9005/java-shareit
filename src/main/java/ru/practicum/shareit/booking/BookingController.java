@@ -50,26 +50,41 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<BookingDto> getBookingsForUser(@NotNull @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return bookingService.getBookingsForUser(userId).stream()
+    public Collection<BookingDto> getBookingsForUser(
+            @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestParam(defaultValue = "default", required = false) String state
+    ) {
+
+        return bookingService.getBookingsForUser(userId,state).stream()
                 .map(booking -> mapper.toBookingDto(booking))
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/owner1")
-    public Collection<BookingDto> getBookingsForOwner(@NotNull @RequestHeader("X-Sharer-User-Id") Long userId) {
+    @GetMapping("/owner")
+    public Collection<BookingDto> getBookingsForOwner(
+            @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestParam(defaultValue = "default", required = false) String state
+    ) {
+
+        if(state != null) {
+            return bookingService.getBookingsOwnerState(userId,state).stream()
+                    .map(booking -> mapper.toBookingDto(booking))
+                    .collect(Collectors.toList());
+        }
+
         return bookingService.getBookingsForOwner(userId).stream()
                 .map(booking -> mapper.toBookingDto(booking))
                 .collect(Collectors.toList());
+
     }
 
-    @GetMapping("/owner/{state}")
-    Collection<BookingDto> getBookingsState(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                            @RequestParam String state
+    /*@GetMapping("/owner")
+    Collection<BookingDto> getBookingsOwnerState(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                 @RequestParam String state
     ) {
         return bookingService.getBookingsState(userId,state).stream()
                 .map(booking -> mapper.toBookingDto(booking))
                 .collect(Collectors.toList());
-    }
+    }*/
 
 }

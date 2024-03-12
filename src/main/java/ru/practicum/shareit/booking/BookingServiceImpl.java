@@ -73,6 +73,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(()->new NotFoundException("Не найднно бронирование под id = " + bookingId));
 
+        Booking setStatusBooking = null;
+
         long owner = booking.getItem().getOwner().getId();
         long booker = booking.getBooker().getId();
 
@@ -82,38 +84,53 @@ public class BookingServiceImpl implements BookingService {
 
         if (owner == userId) { //если userId владелец вещи
             if (approved) { //и approved = true
-                booking.setStatus(Status.APPROVED);//подтверждение бронирования влаельцем вещи
+               setStatusBooking = booking.toBuilder().status(Status.APPROVED).build();//подтверждение бронирования влаельцем вещи
             } else { //и approved = false
-                booking.setStatus(Status.REJECTED);//отклонение бронирования влаельцем вещи
+               setStatusBooking = booking.toBuilder().status(Status.REJECTED).build();//отклонение бронирования влаельцем вещи
             }
 
         }
 
         if (booker == userId ) { //если userId бронирующий вещь
-            if (!approved) { //и approved = false
-                booking.setStatus(Status.CANCELED);//подтверждение бронирования влаельцем вещи
+            if (approved) {
+                throw new NotFoundException(
+                        "Бронирующий # может только отменить бронь!",userId
+                );
+            } else { //и approved = false
+                setStatusBooking = booking.toBuilder().status(Status.CANCELED).build();//отклонение бронирования заказчиком
             }
         }
 
-        Booking upBooking = bookingRepository.save(booking);
+        log.info("Бронь {} до обновления, статус бронирования {} ",bookingId,setStatusBooking.getStatus());
+
+        Booking upBooking = bookingRepository.save(setStatusBooking);
 
         log.info("Обновлен статус бронирования {}",upBooking);
 
         return upBooking;
     }
 
+
     @Override
     public Booking getBookingByIdForUserId(long bookingId, long userId) {
-        if(!userRepository.existsById(userId)) {
-            throw new NotFoundException("Не найден пользователь # при запросе брони # вещи", userId,bookingId);
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Не найден пользователь # при запросе брони # вещи",userId,bookingId);
         }
 
-        return bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(()->new NotFoundException("Не найдено бронирование под id = " + bookingId));
+
+
+        if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
+            throw new NotFoundException("Не найден владелец вещи или заказчик # в бронировании # ", userId, booking.getId());
+        }
+
+        log.info("Вернулась бронирование {} ",booking);
+        return booking;
     }
 
 
-    public Collection<Booking> getBookingsForUser(long userId) {
+    /*public Collection<Booking> getBookingsForUser(long userId) {//для ползователя
         if(!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
         }
@@ -123,10 +140,37 @@ public class BookingServiceImpl implements BookingService {
         log.info("Вернулись брони вещей в количестве = {}",bookingList.size());
 
         return bookingList;
+    }*/
+
+    @Override
+    public Collection<Booking> getBookingsForUser(long userId, String state) {//для ползователя
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
+        }
+
+        List<Booking> bookingList;
+        switch (state) {
+            case "ALL":
+                bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
+            case "FUTURE":
+                bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "start"));
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
+            case "UNSUPPORTED_STATUS":
+                throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                //throw new BadRequestException("Не коректный запрос #, пользователь",state, userId);
+                bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+                log.info("Вернулись брони вещей в количестве = {}, по умолчанию ", bookingList.size());
+                return bookingList;
+        }
+
     }
 
-
-    public Collection<Booking> getBookingsForOwner(long userId) {
+    @Override
+    public Collection<Booking> getBookingsForOwner(long userId) {//для владельца бронирований
         if(!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе бронирований этим пользователем", userId);
         }
@@ -138,17 +182,28 @@ public class BookingServiceImpl implements BookingService {
         return bookingList;
     }
 
-    public Collection<Booking> getBookingsState(long userId, String state) {
+    @Override
+    public Collection<Booking> getBookingsOwnerState(long userId, String state) {//для владельца бронирований
+        if(!userRepository.existsById(userId)) {
+            throw new NotFoundException("Не найден пользователь # при запросе бронирований этим пользователем", userId);
+        }
 
+        List<Booking> bookingOwnerList;
         switch (state) {
             case "ALL":
-                return bookingRepository.findByBookerIdOrderByIdDesc(userId);
+                bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByIdDesc(userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, с ",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
             case "FUTURE":
-                return bookingRepository.findByBookerIdAndStartBefore(userId,LocalDateTime.now());
+                bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
-                throw new BadRequestException("Не коректный запрос #, пользователь",state, userId);
+                bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByIdDesc(userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, по умолчанию",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
 
         }
     }

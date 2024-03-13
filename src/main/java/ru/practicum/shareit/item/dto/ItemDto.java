@@ -8,6 +8,8 @@ import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -28,8 +30,19 @@ public class ItemDto {
     private final User owner;
 
     private final Long request;
-
+    @Builder.ObtainVia(method = "setLastNextBookings")
     private IndicatorBooking lastBooking;
-
+    @Builder.ObtainVia(method = "setLastNextBookings")
     private IndicatorBooking nextBooking;
+    @Builder.Default
+    private final Collection<CommentDto> comments = new ArrayList<>();
+
+    public void setLastNextBookings(List<Booking> bookingsList){
+        if (bookingsList != null && bookingsList.size() >= 2) {
+            Booking bookingLast = bookingsList.get(0);
+            Booking bookingNext = bookingsList.get(1);
+            this.lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
+            this.nextBooking = new IndicatorBooking(bookingNext.getId(),bookingNext.getBooker().getId());
+        }
+    }
 }

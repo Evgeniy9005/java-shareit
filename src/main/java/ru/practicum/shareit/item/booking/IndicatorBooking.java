@@ -9,14 +9,16 @@ import ru.practicum.shareit.booking.Booking;
 
 @Getter
 @ToString
+@RequiredArgsConstructor
 public class IndicatorBooking {
 
-    private long id;
-    private long bookerId;
+    private final long id;
+    private final long bookerId;
 
-    public IndicatorBooking getIndicatorBooking(Booking booking){
+
+   /* public IndicatorBooking getIndicatorBooking(Booking booking){
         this.id = booking.getId();
         this.bookerId = booking.getBooker().getId();
         return this;
-    }
+    }*/
 }

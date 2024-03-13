@@ -9,11 +9,16 @@ import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.booking.IndicatorBooking;
+import ru.practicum.shareit.item.dao.CommentRepository;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,11 +31,15 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemMapper itemMapper;
 
+    private final CommentMapper commentMapper;
+
     private final ItemRepository itemRepository;
 
     private final UserRepository userRepository;
 
     private final BookingRepository bookingRepository;
+
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDto addItem(ItemDto itemDto, long userId) {
@@ -128,16 +137,20 @@ public class ItemServiceImpl implements ItemService {
 
         log.info("Бронирования предэдущий и следующий, всего штук {}", bookingsList.size());
 
-        if(bookingsList.size() > 0) {
-            return itemMapper.toItemDto(item).toBuilder()
-                    .lastBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(0)))
-                    .nextBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(1)))
-                    .build();
-        }
+        int size = bookingsList.size();
+
+        List<Comment> comments = commentRepository.findByItemId(itemId);
+
+        List<CommentDto> commentsDto = commentMapper.toCommentDtoList(comments);
+
 
         log.info("Вернулась вещь {} по запросу пользователя {}", item, userIdMakesRequest);
 
-        return itemMapper.toItemDto(item);
+        return itemMapper.toItemDto(item).toBuilder()
+
+                    .comments(commentsDto)
+                    .build();
+
     }
 
     @Override
@@ -154,5 +167,23 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
     }
 
+
+    public CommentDto addComment(CreateCommentDto createCommentDto, long itemId, long authorId) {
+
+        Comment comment = Comment.builder()
+                .text(createCommentDto.getText())
+                .item(itemRepository.findById(itemId).orElseThrow(
+                        ()-> new NotFoundException("Не найдена вещь #, при добовлении коментария",itemId)))
+                .author(userRepository.findById(authorId).orElseThrow(
+                        ()->new NotFoundException("Не найден пользователь #, при добовлении коментария",authorId)))
+                .created(LocalDateTime.now())
+                .build();
+
+        Comment newComment = commentRepository.save(comment);
+
+        log.info("Добавлен комментарий вещи {} пользователем {}!",itemId,authorId);
+
+        return commentMapper.toCommentDto(newComment);
+    }
 }
 

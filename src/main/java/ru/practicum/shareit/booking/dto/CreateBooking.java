@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter

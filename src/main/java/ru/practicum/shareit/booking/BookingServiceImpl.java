@@ -154,10 +154,17 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "start"));
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
+            case "WAITING":
+                bookingList = bookingRepository.findByBookerIdAndStatusOrderByIdDesc(userId,Status.WAITING);
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
+            case "REJECTED":
+                bookingList = bookingRepository.findByBookerIdAndStatusOrderByIdDesc(userId,Status.REJECTED);
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
-                //throw new BadRequestException("Не коректный запрос #, пользователь",state, userId);
                 bookingList = bookingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
                 log.info("Вернулись брони вещей в количестве = {}, по умолчанию ", bookingList.size());
                 return bookingList;
@@ -193,6 +200,16 @@ public class BookingServiceImpl implements BookingService {
             case "FUTURE":
                 bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
                 log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
+            case "WAITING":
+                bookingOwnerList = bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.WAITING);
+                log.info("Вернулись брони вещей в количестве {}, " +
+                        "запрощенных владельцем {} броней со статусом WAITING",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
+            case "REJECTED":
+                bookingOwnerList = bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.REJECTED);
+                log.info("Вернулись брони вещей в количестве {}, " +
+                        "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");

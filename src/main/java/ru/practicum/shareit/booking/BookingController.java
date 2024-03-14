@@ -1,10 +1,8 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingDtoNoTime;
 import ru.practicum.shareit.booking.dto.CreateBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 
@@ -13,9 +11,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-/**
- * TODO Sprint add-bookings.
- */
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -38,7 +33,7 @@ public class BookingController {
     public BookingDto setStatus(@NotNull @PathVariable Long bookingId,
                                       @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
                                       @RequestParam Boolean approved
-    ){
+    ) {
         return mapper.toBookingDto(bookingService.setStatus(bookingId,userId,approved));
     }
 
@@ -66,7 +61,7 @@ public class BookingController {
             @RequestParam(defaultValue = "default", required = false) String state
     ) {
 
-        if(state != null) {
+        if (state != null) {
             return bookingService.getBookingsOwnerState(userId,state).stream()
                     .map(booking -> mapper.toBookingDto(booking))
                     .collect(Collectors.toList());

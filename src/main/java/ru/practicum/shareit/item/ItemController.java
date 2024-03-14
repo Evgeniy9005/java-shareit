@@ -61,7 +61,6 @@ public class ItemController {
                                  @PathVariable Long itemId,
                                  @RequestHeader("X-Sharer-User-Id") Long authorId) {
 
-        System.out.printf("&&&&&&&&&&& %s , %s  ",itemId,authorId);
         return itemService.addComment(createCommentDto,itemId,authorId);
     }
 

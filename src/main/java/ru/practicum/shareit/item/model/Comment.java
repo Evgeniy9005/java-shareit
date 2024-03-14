@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.User;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
 

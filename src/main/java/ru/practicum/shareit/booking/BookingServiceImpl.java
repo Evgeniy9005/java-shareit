@@ -36,7 +36,7 @@ public class BookingServiceImpl implements BookingService {
     validDate(createBooking);
 
     Item item = itemRepository.findById(createBooking.getItemId())
-            .orElseThrow(()-> new NotFoundException("Не найдена, при бронировании вещь!"));
+            .orElseThrow(() -> new NotFoundException("Не найдена, при бронировании вещь!"));
 
     if (item.getOwner().getId() == userId) {
         throw new NotFoundException("Не может владелец вещи создать бронь на свою вещь!");
@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
             .end(createBooking.getEnd())
             .item(item)
             .booker(userRepository.findById(userId).orElseThrow(
-                    ()->new NotFoundException("Не найден, при бронировании пользователь " + userId)))
+                    () -> new NotFoundException("Не найден, при бронировании пользователь " + userId)))
             .status(Status.WAITING)
             .build();
 
@@ -70,16 +70,12 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()->new NotFoundException("Не найднно бронирование под id = " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Не найднно бронирование под id = " + bookingId));
 
         Booking setStatusBooking = null;
 
         long owner = booking.getItem().getOwner().getId();
         long booker = booking.getBooker().getId();
-
-        if(owner == booker) {
-
-        }
 
         if (owner == userId) { //если userId владелец вещи
             if (approved) { //и approved = true
@@ -92,10 +88,9 @@ public class BookingServiceImpl implements BookingService {
             } else { //и approved = false
                setStatusBooking = booking.toBuilder().status(Status.REJECTED).build();//отклонение бронирования влаельцем вещи
             }
-
         }
 
-        if (booker == userId ) { //если userId бронирующий вещь
+        if (booker == userId) { //если userId бронирующий вещь
             if (approved) {
                 throw new NotFoundException(
                         "Бронирующий # может только отменить бронь!",userId
@@ -122,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()->new NotFoundException("Не найдено бронирование под id = " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Не найдено бронирование под id = " + bookingId));
 
 
         if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
@@ -135,7 +130,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public Collection<Booking> getBookingsForUser(long userId, String state) {//для ползователя
+    public Collection<Booking> getBookingsForUser(long userId, String state) { //для ползователя
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
         }
@@ -177,8 +172,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<Booking> getBookingsForOwner(long userId) {//для владельца бронирований
-        if(!userRepository.existsById(userId)) {
+    public Collection<Booking> getBookingsForOwner(long userId) { //для владельца бронирований
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе бронирований этим пользователем", userId);
         }
 
@@ -190,8 +185,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Collection<Booking> getBookingsOwnerState(long userId, String state) {//для владельца бронирований
-        if(!userRepository.existsById(userId)) {
+    public Collection<Booking> getBookingsOwnerState(long userId, String state) { //для владельца бронирований
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе бронирований этим пользователем", userId);
         }
 
@@ -199,11 +194,13 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case "ALL":
                 bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByIdDesc(userId);
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, с ",bookingOwnerList.size(),userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, с ",
+                        bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "FUTURE":
                 bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",bookingOwnerList.size(),userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",
+                        bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "WAITING":
                 bookingOwnerList = bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.WAITING);
@@ -221,7 +218,8 @@ public class BookingServiceImpl implements BookingService {
                         "запрощенных владельцем {} броней со статусом CURRENT",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "PAST":
-                bookingOwnerList = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now());
+                bookingOwnerList = bookingRepository
+                        .findByItemOwnerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now());
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом PAST",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
@@ -229,12 +227,12 @@ public class BookingServiceImpl implements BookingService {
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
                 bookingOwnerList = bookingRepository.findByItemOwnerIdOrderByIdDesc(userId);
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, по умолчанию",bookingOwnerList.size(),userId);
+                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, по умолчанию",
+                        bookingOwnerList.size(),userId);
                 return bookingOwnerList;
 
         }
     }
-
 
     private void validDate(CreateBooking createBooking) {
         LocalDateTime start = createBooking.getStart();
@@ -242,19 +240,19 @@ public class BookingServiceImpl implements BookingService {
 
         int equals = start.compareTo(end);
 
-        if(equals == 0) {
+        if (equals == 0) {
             throw new BadRequestException(
                     "Время начала # бронирования не может быть равно времени окончания #",start,end
             );
         }
 
-        if(equals > 0) {
+        if (equals > 0) {
             throw new BadRequestException(
                     "Время начала # бронирования не может быть позже времени окончания #",start,end
             );
         }
 
-        if(start.compareTo(LocalDateTime.now()) < 0) {
+        if (start.compareTo(LocalDateTime.now()) < 0) {
             throw new BadRequestException("Время начала # бронирования не может быть в прошлом!",start);
         }
     }

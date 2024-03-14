@@ -48,7 +48,7 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = itemRepository.save(
                 itemMapper.toItem(itemDto.toBuilder().owner(
                         userRepository.findById(userId).orElseThrow(
-                                ()-> new NotFoundException(
+                                () -> new NotFoundException(
                                         "при добовлении вещи не найден пользователь под id = " + userId))
                 ).build())
         );
@@ -61,8 +61,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto upItem(ItemDto itemDto, long itemId, long userId) {
-
-       // itemMapper.toItem(Patch.patchItemDto())
 
         if (userId <= 0) {
             throw new BadRequestException("Не коректный id пользователя = " + userId);
@@ -83,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getItem(long itemId, long userId) {
 
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(()-> new NotFoundException("Не найдена вещь под id = " + itemId));
+                .orElseThrow(() -> new NotFoundException("Не найдена вещь под id = " + itemId));
 
 
 
@@ -100,8 +98,8 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByOwnerId(userId).stream()
                 .map(item -> {
                     List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                           // bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId)
-                            bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(item.getId(),userId,Status.APPROVED)
+                            bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(
+                                            item.getId(),userId,Status.APPROVED)
                     );
 
                     log.info("При возврате всех вещей пользователя. " +
@@ -133,11 +131,10 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item item = itemRepository.findById(itemId).orElseThrow(
-                ()-> new NotFoundException("Не найдена вешь под id = " + itemId)
+                () -> new NotFoundException("Не найдена вешь под id = " + itemId)
         );
 
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-             //bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
                 bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
         );
 
@@ -174,24 +171,17 @@ public class ItemServiceImpl implements ItemService {
 
     public CommentDto addComment(CreateCommentDto createCommentDto, long itemId, long authorId) {
 
-        /*List<Item> itemList = itemRepository.findAll();
-        System.out.println();
-        itemList.stream().forEach(item -> System.out.println("?????? - "+ item));
-        System.out.println();*/
-        /*System.out.println();
-        bookingRepository.findAll().stream().forEach(booking -> System.out.println("???? _ " + booking));
-        System.out.println();*/
-
-        if (!bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
+        if (!bookingRepository
+                .existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
           throw new BadRequestException("У пользователя небыло вещи # в аренде!",itemId);
         }
 
         Comment comment = Comment.builder()
                 .text(createCommentDto.getText())
                 .item(itemRepository.findById(itemId).orElseThrow(
-                        ()-> new NotFoundException("Не найдена вещь #, при добовлении коментария",itemId)))
+                        () -> new NotFoundException("Не найдена вещь #, при добовлении коментария",itemId)))
                 .author(userRepository.findById(authorId).orElseThrow(
-                        ()->new NotFoundException("Не найден пользователь #, при добовлении коментария",authorId)))
+                        () -> new NotFoundException("Не найден пользователь #, при добовлении коментария",authorId)))
                 .created(LocalDateTime.now())
                 .build();
 
@@ -204,18 +194,17 @@ public class ItemServiceImpl implements ItemService {
 
     private List<IndicatorBooking> setIndicatorBooking(List<Booking> bookingsList) {
 
-
         IndicatorBooking lastBooking = null;
         IndicatorBooking nextBooking = null;
         List<IndicatorBooking> indicatorBookingList = new ArrayList<>();
 
-        if(bookingsList == null) {
+        if (bookingsList == null) {
             return indicatorBookingList;
         }
 
         int size = bookingsList.size();
 
-        if(size == 1) {
+        if (size == 1) {
             Booking bookingLast = bookingsList.get(0);
             lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
             indicatorBookingList.add(lastBooking);
@@ -235,7 +224,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (size > 2) {
             Booking bookingLast = bookingsList.get(1);
-            Booking bookingNext = bookingsList.get(size-2);
+            Booking bookingNext = bookingsList.get(size - 2);
             lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
             nextBooking = new IndicatorBooking(bookingNext.getId(),bookingNext.getBooker().getId());
             indicatorBookingList.add(lastBooking);

@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
     public Booking setStatus(long bookingId, long userId, Boolean approved) {
 
         if (approved == null) {
-            throw new BadRequestException("Не определен статус одобрения # вещи на бронирование!", approved);
+            throw new BadRequestException("Не определен статус одобрения # вещи на бронирование!");
         }
 
         Booking booking = bookingRepository.findById(bookingId)

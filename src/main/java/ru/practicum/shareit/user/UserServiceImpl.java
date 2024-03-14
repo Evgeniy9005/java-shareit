@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                ()-> new NotFoundException("Не найден пользователь под id = "+userId)
+                () -> new NotFoundException("Не найден пользователь под id = " + userId)
         );
 
         log.info("Возвращается пользователь {}", user);

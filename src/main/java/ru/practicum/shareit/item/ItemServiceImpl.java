@@ -98,19 +98,18 @@ public class ItemServiceImpl implements ItemService {
 
         return itemRepository.findByOwnerId(userId).stream()
                 .map(item -> {
-                    List<Booking> bookingsList = bookingRepository
-                            .findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId);
+                    List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
+                            bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId)
+                    );
 
                     log.info("При возврате всех вещей пользователя. " +
-                            "Бронирования предэдущий и следующий, всего штук {}!", bookingsList.size());
+                            "Бронирования предэдущий и следующий, всего штук {}!", indicatorBookingList.size());
 
-                    if(bookingsList.size() > 0) {
                         return itemMapper.toItemDto(item).toBuilder()
-                                .lastBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(0)))
-                                .nextBooking(new IndicatorBooking().getIndicatorBooking(bookingsList.get(1)))
+                                .lastBooking(indicatorBookingList.get(0))
+                                .nextBooking(indicatorBookingList.get(1))
                                 .build();
-                    }
-                return  itemMapper.toItemDto(item);
+
                 })
                 .collect(Collectors.toList());
     }
@@ -127,17 +126,16 @@ public class ItemServiceImpl implements ItemService {
            );
         }
 
-
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()-> new NotFoundException("Не найдена вешь под id = " + itemId)
         );
 
-        List<Booking> bookingsList = bookingRepository
-                .findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest);
 
-        log.info("Бронирования предэдущий и следующий, всего штук {}", bookingsList.size());
+        List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
+                bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
+        );
 
-        int size = bookingsList.size();
+        log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());
 
         List<Comment> comments = commentRepository.findByItemId(itemId);
 
@@ -147,7 +145,8 @@ public class ItemServiceImpl implements ItemService {
         log.info("Вернулась вещь {} по запросу пользователя {}", item, userIdMakesRequest);
 
         return itemMapper.toItemDto(item).toBuilder()
-
+                    .lastBooking(indicatorBookingList.get(0))
+                    .nextBooking(indicatorBookingList.get(1))
                     .comments(commentsDto)
                     .build();
 
@@ -184,6 +183,24 @@ public class ItemServiceImpl implements ItemService {
         log.info("Добавлен комментарий вещи {} пользователем {}!",itemId,authorId);
 
         return commentMapper.toCommentDto(newComment);
+    }
+
+    private List<IndicatorBooking> setIndicatorBooking(List<Booking> bookingsList) {
+
+        IndicatorBooking lastBooking = null;
+        IndicatorBooking nextBooking = null;
+        List<IndicatorBooking> indicatorBookingList = new ArrayList<>();
+
+        if (bookingsList != null && bookingsList.size() >= 2) {
+            Booking bookingLast = bookingsList.get(0);
+            Booking bookingNext = bookingsList.get(1);
+            lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
+            nextBooking = new IndicatorBooking(bookingNext.getId(),bookingNext.getBooker().getId());
+        }
+
+        indicatorBookingList.add(lastBooking);
+        indicatorBookingList.add(nextBooking);
+        return indicatorBookingList;
     }
 }
 

@@ -117,10 +117,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemByRequestUsers(long itemId, long userIdMakesRequest) {
 
-        System.out.println();
-        bookingRepository.findAll().stream().forEach(booking -> System.out.println("???? _ " + booking));
-        System.out.println();
-
         if (!userRepository.existsById(userIdMakesRequest)) {
            throw new NotFoundException(
                    "Не найден пользователь # при запросе вещи # пользователем #",
@@ -135,7 +131,8 @@ public class ItemServiceImpl implements ItemService {
         );
 
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
+                bookingRepository
+                        .findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
         );
 
         log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());

@@ -163,7 +163,7 @@ public class BookingServiceImpl implements BookingService {
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "PAST":
-                bookingList = bookingRepository.findByBookerIdAndEndBeforeOrderByIdAsc(userId,LocalDateTime.now());
+                bookingList = bookingRepository.findByBookerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now());
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "UNSUPPORTED_STATUS":
@@ -218,7 +218,12 @@ public class BookingServiceImpl implements BookingService {
             case "CURRENT":
                 bookingOwnerList = bookingRepository.findByBookingCurrentForOwner(userId,LocalDateTime.now());
                 log.info("Вернулись брони вещей в количестве {}, " +
-                        "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
+                        "запрощенных владельцем {} броней со статусом CURRENT",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
+            case "PAST":
+                bookingOwnerList = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now());
+                log.info("Вернулись брони вещей в количестве {}, " +
+                        "запрощенных владельцем {} броней со статусом PAST",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");

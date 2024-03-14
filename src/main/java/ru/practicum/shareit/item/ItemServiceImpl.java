@@ -100,7 +100,8 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByOwnerId(userId).stream()
                 .map(item -> {
                     List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                            bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId)
+                           // bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(item.getId(),userId)
+                            bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(item.getId(),userId,Status.APPROVED)
                     );
 
                     log.info("При возврате всех вещей пользователя. " +
@@ -118,6 +119,10 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemByRequestUsers(long itemId, long userIdMakesRequest) {
 
+        System.out.println();
+        bookingRepository.findAll().stream().forEach(booking -> System.out.println("???? _ " + booking));
+        System.out.println();
+
         if (!userRepository.existsById(userIdMakesRequest)) {
            throw new NotFoundException(
                    "Не найден пользователь # при запросе вещи # пользователем #",
@@ -132,7 +137,8 @@ public class ItemServiceImpl implements ItemService {
         );
 
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-             bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
+             //bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
+                bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
         );
 
         log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());
@@ -208,6 +214,14 @@ public class ItemServiceImpl implements ItemService {
         }
 
         int size = bookingsList.size();
+
+        if(size == 1) {
+            Booking bookingLast = bookingsList.get(0);
+            lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
+            indicatorBookingList.add(lastBooking);
+            indicatorBookingList.add(nextBooking);
+            return indicatorBookingList;
+        }
 
         if (size == 2 || size == 3) {
             Booking bookingLast = bookingsList.get(0);

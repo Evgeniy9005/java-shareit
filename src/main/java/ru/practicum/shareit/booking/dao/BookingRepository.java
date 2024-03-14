@@ -23,8 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     /*@Modifying
     @Query("select b from bookings b where b.item.id ?1 order by b.start limit ?2")
     List<Booking> findByItemIdOrderByStartAsc(long itemId, int limit);*/
-    List<Booking> findByItemIdAndItemOwnerIdOrderByStartAsc(long itemId,long userId);
-
+    //List<Booking> findByItemIdAndItemOwnerIdOrderByStartAsc(long itemId,long userId);
+    List<Booking> findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(long itemId,long ownerId, Status approved);
 
     //наличие вещи в аренде
     boolean existsByItemIdAndBookerIdAndStatusAndEndBefore(
@@ -38,6 +38,7 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     @Query("select b from Booking b where b.item.owner.id = ?1 and b.start <= ?2 and b.end >= ?2 order by b.id asc")
     List<Booking> findByBookingCurrentForOwner(long ownerId, LocalDateTime current);
 
-    List<Booking> findByBookerIdAndEndBeforeOrderByIdAsc(long bookerId, LocalDateTime past);
+    List<Booking> findByBookerIdAndEndBeforeOrderByEndDesc(long bookerId, LocalDateTime past);
 
+    List<Booking> findByItemOwnerIdAndEndBeforeOrderByEndDesc(long ownerId, LocalDateTime past);
 }

@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dao.BookingRepository;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.CreateBooking;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnsupportedStatusException;
@@ -16,7 +14,6 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +22,6 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-//@RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -162,6 +158,14 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findByBookerIdAndStatusOrderByIdDesc(userId,Status.REJECTED);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
+            case "CURRENT":
+                bookingList = bookingRepository.findByBookingCurrentForBooker(userId,LocalDateTime.now());
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
+            case "PAST":
+                bookingList = bookingRepository.findByBookerIdAndEndBeforeOrderByIdAsc(userId,LocalDateTime.now());
+                log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
+                return bookingList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
@@ -208,6 +212,11 @@ public class BookingServiceImpl implements BookingService {
                 return bookingOwnerList;
             case "REJECTED":
                 bookingOwnerList = bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.REJECTED);
+                log.info("Вернулись брони вещей в количестве {}, " +
+                        "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
+                return bookingOwnerList;
+            case "CURRENT":
+                bookingOwnerList = bookingRepository.findByBookingCurrentForOwner(userId,LocalDateTime.now());
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
                 return bookingOwnerList;

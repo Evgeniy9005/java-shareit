@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dao.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -130,17 +131,15 @@ public class ItemServiceImpl implements ItemService {
                 ()-> new NotFoundException("Не найдена вешь под id = " + itemId)
         );
 
-
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
+             bookingRepository.findByItemIdAndItemOwnerIdOrderByStartAsc(itemId,userIdMakesRequest)
         );
 
         log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());
 
-        List<Comment> comments = commentRepository.findByItemId(itemId);
-
-        List<CommentDto> commentsDto = commentMapper.toCommentDtoList(comments);
-
+        List<CommentDto> commentsDto = commentMapper.toCommentDtoList(
+                commentRepository.findByItemId(itemId)
+        );
 
         log.info("Вернулась вещь {} по запросу пользователя {}", item, userIdMakesRequest);
 
@@ -169,6 +168,18 @@ public class ItemServiceImpl implements ItemService {
 
     public CommentDto addComment(CreateCommentDto createCommentDto, long itemId, long authorId) {
 
+        /*List<Item> itemList = itemRepository.findAll();
+        System.out.println();
+        itemList.stream().forEach(item -> System.out.println("?????? - "+ item));
+        System.out.println();*/
+        /*System.out.println();
+        bookingRepository.findAll().stream().forEach(booking -> System.out.println("???? _ " + booking));
+        System.out.println();*/
+
+        if (!bookingRepository.existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
+          throw new BadRequestException("У пользователя небыло вещи # в аренде!",itemId);
+        }
+
         Comment comment = Comment.builder()
                 .text(createCommentDto.getText())
                 .item(itemRepository.findById(itemId).orElseThrow(
@@ -187,15 +198,35 @@ public class ItemServiceImpl implements ItemService {
 
     private List<IndicatorBooking> setIndicatorBooking(List<Booking> bookingsList) {
 
+
         IndicatorBooking lastBooking = null;
         IndicatorBooking nextBooking = null;
         List<IndicatorBooking> indicatorBookingList = new ArrayList<>();
 
-        if (bookingsList != null && bookingsList.size() >= 2) {
+        if(bookingsList == null) {
+            return indicatorBookingList;
+        }
+
+        int size = bookingsList.size();
+
+        if (size == 2 || size == 3) {
             Booking bookingLast = bookingsList.get(0);
             Booking bookingNext = bookingsList.get(1);
             lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
             nextBooking = new IndicatorBooking(bookingNext.getId(),bookingNext.getBooker().getId());
+            indicatorBookingList.add(lastBooking);
+            indicatorBookingList.add(nextBooking);
+            return indicatorBookingList;
+        }
+
+        if (size > 2) {
+            Booking bookingLast = bookingsList.get(1);
+            Booking bookingNext = bookingsList.get(size-2);
+            lastBooking = new IndicatorBooking(bookingLast.getId(),bookingLast.getBooker().getId());
+            nextBooking = new IndicatorBooking(bookingNext.getId(),bookingNext.getBooker().getId());
+            indicatorBookingList.add(lastBooking);
+            indicatorBookingList.add(nextBooking);
+            return indicatorBookingList;
         }
 
         indicatorBookingList.add(lastBooking);

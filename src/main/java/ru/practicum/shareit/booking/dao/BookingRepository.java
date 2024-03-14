@@ -5,8 +5,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.item.model.Item;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByItemOwnerIdOrderByIdDesc(long ownerId);
@@ -22,5 +25,19 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByItemIdOrderByStartAsc(long itemId, int limit);*/
     List<Booking> findByItemIdAndItemOwnerIdOrderByStartAsc(long itemId,long userId);
 
+
+    //наличие вещи в аренде
+    boolean existsByItemIdAndBookerIdAndStatusAndEndBefore(
+            long itemId, long bookerId, Status approved, LocalDateTime end);
+
+    //текущие бронирования созданные пользователем
+    @Query("select b from Booking b where b.booker.id = ?1 and b.start <= ?2 and b.end >= ?2 order by b.id asc")
+    List<Booking> findByBookingCurrentForBooker(long bookerId, LocalDateTime current);
+
+    //текущие бронирования хозяина вещей
+    @Query("select b from Booking b where b.item.owner.id = ?1 and b.start <= ?2 and b.end >= ?2 order by b.id asc")
+    List<Booking> findByBookingCurrentForOwner(long ownerId, LocalDateTime current);
+
+    List<Booking> findByBookerIdAndEndBeforeOrderByIdAsc(long bookerId, LocalDateTime past);
 
 }

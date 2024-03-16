@@ -47,7 +47,7 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> getBookingsForUser(
             @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "default", required = false) String state
+            @RequestParam(defaultValue = "default") String state
     ) {
 
         return bookingService.getBookingsForUser(userId,state).stream()
@@ -58,7 +58,7 @@ public class BookingController {
     @GetMapping("/owner")
     public Collection<BookingDto> getBookingsForOwner(
             @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "default", required = false) String state
+            @RequestParam(defaultValue = "default") String state
     ) {
 
         if (state != null) {

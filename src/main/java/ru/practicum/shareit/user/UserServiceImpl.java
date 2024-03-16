@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.patch.Patch;
 import ru.practicum.shareit.user.dao.UserRepository;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public UserDto addUser(UserDto userDto) {
 
         User user = userRepository.save(userMapper.toUser(userDto));
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto upUser(UserDto userDto, long userId) {
 
         User upUser = userMapper.toUser(
@@ -51,6 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUser(long userId) {
 
         userRepository.deleteById(userId);
@@ -83,6 +87,5 @@ public class UserServiceImpl implements UserService {
 
         return set;
     }
-
 
 }

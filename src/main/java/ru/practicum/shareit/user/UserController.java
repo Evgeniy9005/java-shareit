@@ -21,17 +21,7 @@ private final UserService userService;
 
     @PatchMapping("/{userId}")
     public UserDto upUser(@RequestBody UserDto userDto, @PathVariable Long userId) {
-
-        if (userDto.getEmail() != null) {
-           return userService.upUser(valid(userDto),userId);
-        }
-
         return userService.upUser(userDto,userId);
-    }
-
-    @Valid
-    private UserDto valid(UserDto userDto) {
-        return userDto;
     }
 
     @DeleteMapping("/{userId}")

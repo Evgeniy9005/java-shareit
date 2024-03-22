@@ -28,7 +28,7 @@ public class ItemDto {
 
     private final User owner;
 
-    private final Long request;
+    private final Long requestId;
 
     private final IndicatorBooking lastBooking;
 

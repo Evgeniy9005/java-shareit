@@ -28,14 +28,14 @@ public class Patch {
        String description = patch.getDescription();
        Boolean available = patch.getAvailable();
        User owner = patch.getOwner();
-       Long request = patch.getRequest();
+       Long request = patch.getRequestId();
        return updated.builder()
                .id(id == null ? updated.getId() : id)
                .name(name == null ? updated.getName() : name)
                .description(description == null ? updated.getDescription() : description)
                .available(available == null ? updated.getAvailable() : available)
                .owner(owner == null ? updated.getOwner() : owner)
-               .request(request == null ? updated.getRequest() : request)
+               .requestId(request == null ? updated.getRequestId() : request)
                .build();
     }
 }

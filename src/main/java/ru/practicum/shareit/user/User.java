@@ -1,8 +1,6 @@
 package ru.practicum.shareit.user;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -10,7 +8,9 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users", schema = "public")
 public class User {
 

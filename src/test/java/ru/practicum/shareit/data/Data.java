@@ -17,6 +17,15 @@ import java.util.stream.IntStream;
 
 public class Data {
 
+    public static final String ALL = "ALL";
+    public static final String FUTURE = "FUTURE";
+    public static final String WAITING = "WAITING";
+    public static final String REJECTED = "REJECTED";
+    public static final String CURRENT = "CURRENT";
+    public static final String PAST = "PAST";
+    public static final String UNSUPPORTED_STATUS = "UNSUPPORTED_STATUS";
+    public static final String DEFAULT = "DEFAULT";
+
 
     public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects){
 
@@ -54,7 +63,6 @@ public class Data {
 
 
         if(type.equals(Booking.class)) {
-
             if(objects.length == 2) {
                 if(objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Item.class)) {
                     try {

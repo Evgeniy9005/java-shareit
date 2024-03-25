@@ -25,6 +25,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.util.Util;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -97,8 +98,8 @@ class ItemRequestServiceImplTest {
         int from = 0;
         int size = 10;
 
-        Sort sortByDate = Sort.by(Sort.Direction.DESC,"created");
-        Pageable page = PageRequest.of(from,size,sortByDate);
+        Pageable page = Util.validPageParam(from,size);
+
         Page<ItemRequest> pegs= new PageImpl<>(Data.generationData(10,ItemRequest.class));
         when(itemRequestRepository.findAll(page)).thenReturn(pegs);
 

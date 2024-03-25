@@ -2,6 +2,8 @@ package ru.practicum.shareit.data;
 
 import org.apache.el.stream.Stream;
 import org.hibernate.mapping.Collection;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
@@ -16,7 +18,7 @@ import java.util.stream.IntStream;
 public class Data {
 
 
-    public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects) {
+    public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects){
 
         return (List<T>) IntStream.iterate(1,i -> i+1)
                         .mapToObj(i -> getData(i,t,objects))
@@ -50,6 +52,29 @@ public class Data {
            return (D) new Item(i,"item"+i,"описание вещи "+i, false, new User(1,"User","user@mail"),1L);
         }
 
+
+        if(type.equals(Booking.class)) {
+
+            if(objects.length == 2) {
+                if(objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Item.class)) {
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        System.out.println(e);
+                    }
+                    return (D) Booking.builder()
+                            .id(i)
+                            .booker((User) objects[0])
+                            .item((Item) objects[1])
+                            .start(LocalDateTime.now())
+                            .end(LocalDateTime.now().plusDays(1))
+                            .status(Status.APPROVED)
+                            .build();
+                }
+            }
+
+        }
+
         return null;
     }
 
@@ -68,9 +93,10 @@ public class Data {
     }*/
 
     public static <T> void printList(List<T> list,String separator){
-        System.out.println(separator.repeat(100));
+
+        System.out.println(separator.repeat(33));
         list.stream().forEach(System.out::println);
-        System.out.println(separator.repeat(100));
+        System.out.println(separator.repeat(33));
     }
 
     public static void separato__________________________________r() {

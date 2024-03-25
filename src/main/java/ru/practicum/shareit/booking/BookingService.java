@@ -11,9 +11,10 @@ public interface BookingService {
 
     Booking getBookingByIdForUserId(long bookingId, long userId);
 
-    Collection<Booking> getBookingsForUser(long userId, String state);
+    Collection<Booking> getBookingsForUser(long userId, String state, int from, int size);
 
-    Collection<Booking> getBookingsForOwner(long userId);
 
-    Collection<Booking> getBookingsOwnerState(long userId, String state);
+  //  Collection<Booking> getBookingsForOwner(long userId);
+
+    Collection<Booking> getBookingsOwnerState(long userId, String state, int from, int size);
 }

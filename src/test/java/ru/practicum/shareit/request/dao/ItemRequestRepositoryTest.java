@@ -46,9 +46,7 @@ class ItemRequestRepositoryTest {
                 .stream()
                 .map(user -> userRepository.save(user))
                 .collect(Collectors.toList());
-        Data.separato__________________________________r();
-        savedUser.stream().forEach(System.out::println);
-        Data.separato__________________________________r();
+        Data.printList(savedUser,"*");
 
     }
 
@@ -60,9 +58,7 @@ class ItemRequestRepositoryTest {
                 .stream()
                 .map(itemRequest -> itemRequestRepository.save(itemRequest))
                 .collect(Collectors.toList());
-        Data.separato__________________________________r();
-        savedItemRequests.stream().forEach(System.out::println);
-        Data.separato__________________________________r();
+        Data.printList(savedItemRequests,"*^");
 
         assertEquals(3,itemRequestRepository.findByRequester(1).size(),
                 "у пользователя 1 3 запроса");
@@ -113,6 +109,30 @@ class ItemRequestRepositoryTest {
 
         page = itemRequestPage2.nextOrLastPageable();
 
+        page = PageRequest.of(0,5,sortByDate);
+        Page<ItemRequest> itemRequestPage4 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage4.getContent(),"===");
+
+        page = PageRequest.of(0,3);
+        Page<ItemRequest> itemRequestPage5 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage5.getContent(),"^^^");
+
+        page = PageRequest.of(1,3);
+        Page<ItemRequest> itemRequestPage6 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage6.getContent(),">>>");
+
+        page = PageRequest.of(1,3);
+        Page<ItemRequest> itemRequestPage7 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage7.getContent(),":::");
+
+        page = PageRequest.of(2,3);
+        Page<ItemRequest> itemRequestPage8 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage8.getContent(),"*T*");
+
+        page = PageRequest.of(3,3);
+        Page<ItemRequest> itemRequestPage9 = itemRequestRepository.findAll(page);
+        Data.printList(itemRequestPage9.getContent(),"|||");
+
     }
 
     @Test
@@ -124,7 +144,19 @@ class ItemRequestRepositoryTest {
     }
 
 
+    @Test
+    void existByRequester() {
+        List<ItemRequest> savedItemRequester = Data.<ItemRequest>generationData(1,ItemRequest.class)
+                .stream()
+                .map(itemRequest -> itemRequestRepository.save(itemRequest))
+                .collect(Collectors.toList());
 
+        assertEquals(1,savedItemRequester.size());
+        assertEquals(1,savedItemRequester.get(0).getRequester());
+
+        assertTrue(itemRequestRepository.existsByRequester(savedUser.get(0).getId()));
+
+    }
 
 
 }

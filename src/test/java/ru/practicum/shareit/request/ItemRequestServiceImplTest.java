@@ -14,6 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 import ru.practicum.shareit.data.Data;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemMapperImpl;
+import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequest;
@@ -45,6 +48,8 @@ class ItemRequestServiceImplTest {
     private ItemRequestService itemRequestService;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ItemRepository itemRepository;
 
     @Mock
     private ItemRequestRepository itemRequestRepository;
@@ -73,7 +78,7 @@ class ItemRequestServiceImplTest {
 
     @BeforeEach
     void start() {
-    itemRequestService = new ItemRequestServiceImpl(userRepository,itemRequestRepository,new ItemRequestMapperImpl());
+    itemRequestService = new ItemRequestServiceImpl(userRepository,itemRepository,itemRequestRepository,new ItemRequestMapperImpl(),new ItemMapperImpl());
 
     }
 

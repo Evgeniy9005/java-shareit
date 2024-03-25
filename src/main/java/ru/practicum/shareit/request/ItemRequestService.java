@@ -10,6 +10,7 @@ public interface ItemRequestService {
 
     Collection<ItemRequestDto> getItemsRequester(long userId);
 
-    Collection<ItemRequestDto> getItemsRequesterPagination(long userId, Integer from, Integer size);
+    Collection<ItemRequestDto> getItemsRequesterPagination(long userId, int from, int size);
 
+    ItemRequestDto getItemRequestByIdForOtherUser(long userId, long requestId);
 }

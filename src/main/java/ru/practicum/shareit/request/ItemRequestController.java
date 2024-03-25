@@ -30,9 +30,16 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     Collection<ItemRequestDto> getItemsRequesterPagination(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                           @RequestParam(required = false) Integer from,
-                                                           @RequestParam(required = false) Integer size
+                                                           @RequestParam(defaultValue = "0") int from,
+                                                           @RequestParam(defaultValue = "10") int size
     ) {
         return service.getItemsRequesterPagination(userId,from,size);
+    }
+
+    @GetMapping("/{requestId}")
+    public ItemRequestDto getItemRequestByIdForOtherUser(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                         @PathVariable Long requestId
+    ) {
+        return service.getItemRequestByIdForOtherUser(userId,requestId);
     }
 }

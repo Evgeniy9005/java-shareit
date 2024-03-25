@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.CreateBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.util.Util;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -47,10 +48,12 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> getBookingsForUser(
             @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "default") String state
+            @RequestParam(defaultValue = "default") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
 
-        return bookingService.getBookingsForUser(userId,state).stream()
+        return bookingService.getBookingsForUser(userId,state,from,size).stream()
                 .map(booking -> mapper.toBookingDto(booking))
                 .collect(Collectors.toList());
     }
@@ -58,19 +61,23 @@ public class BookingController {
     @GetMapping("/owner")
     public Collection<BookingDto> getBookingsForOwner(
             @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "default") String state
+            @RequestParam(defaultValue = "default") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
     ) {
 
-        if (state != null) {
-            return bookingService.getBookingsOwnerState(userId,state).stream()
+        return bookingService.getBookingsOwnerState(userId, state, from, size).stream()
+                .map(booking -> mapper.toBookingDto(booking))
+                .collect(Collectors.toList());
+
+       /* if (state != null) {
+            return bookingService.getBookingsOwnerState(userId,state,from,size).stream()
                     .map(booking -> mapper.toBookingDto(booking))
                     .collect(Collectors.toList());
         }
 
         return bookingService.getBookingsForOwner(userId).stream()
                 .map(booking -> mapper.toBookingDto(booking))
-                .collect(Collectors.toList());
-
+                .collect(Collectors.toList());*/
     }
-
 }

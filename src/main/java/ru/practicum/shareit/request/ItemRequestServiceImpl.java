@@ -10,7 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.util.Util;
 
 import javax.xml.crypto.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +38,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository repository;
 
     private final ItemRequestMapper mapper;
+
+    private final ItemMapper itemMapper;
 
     @Transactional
     public ItemRequestDto addItemRequest(CreateItemRequest createRequest, long userId) {
@@ -63,14 +68,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(itemRequestList).stream()
                 .map(itemRequestDto -> itemRequestDto.toBuilder()
-                        .items(itemRepository.findByRequest(itemRequestDto.getId()))
+                        .items(itemMapper.toItemDtoList(itemRepository.findByRequest(itemRequestDto.getId())))
                         .build())
                 .collect(Collectors.toList());
 
         return itemRequestDtoList;
     }
 
-    public Collection<ItemRequestDto> getItemsRequesterPagination(long userId, Integer from, Integer size) {
+    public Collection<ItemRequestDto> getItemsRequesterPagination(long userId, int from, int size) {
 
         if(!userRepository.existsById(userId)) {
             throw new NotFoundException(
@@ -78,27 +83,56 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
 
         Sort sortByDate = Sort.by(Sort.Direction.DESC,"created");
-        Pageable page = Util.validPageParam(from,size,0,5,sortByDate);
+       // Pageable page = Util.validPageParam(from,size);
+        Pageable page = PageRequest.of(from,size);
+        List<ItemRequest> itemRequestList;
 
-        Page<ItemRequest> itemRequestPage = repository.findAll(page);
+        if(repository.existsByRequester(userId)) {
 
-       // List<ItemRequest> itemRequestList = itemRequestPage.getContent().stream().map(itemRequest -> itemRequest);
+            /*данный эндпоинт возвращает список запросов,
+            на которые пользователь может ответить.
+            Автор запроса не может ответить на свой же запрос*/
+            /*List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(repository.findAll(page).getContent());
+            log.info("Получены все запросы на вещи в количестве {} в диапозоне от {} до {} без items",
+                    itemRequestDtoList.size(),
+                    from,
+                    size
+            );*/
+            return new ArrayList<>();
+        } else {
 
-        List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(itemRequestPage.getContent()).stream()
-                .map(itemRequestDto -> itemRequestDto.toBuilder()
-                        .items(itemRepository.findByRequest(itemRequestDto.getId()))
-                        .build())
-                .collect(Collectors.toList());
+            List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(repository.findAll(page).getContent()).stream()
+                    .map(itemRequestDto -> itemRequestDto.toBuilder()
+                            .items(itemMapper.toItemDtoList(itemRepository.findByRequest(itemRequestDto.getId())))
+                            .build())
+                    .collect(Collectors.toList());
 
-        log.info("Получены все запросы на вещи в количестве {} в диапозоне от {} до {}",
-                itemRequestDtoList.size(),
-                from,
-                size
-        );
+            log.info("Получены все запросы на вещи в количестве {} в диапозоне от {} до {}",
+                    itemRequestDtoList.size(),
+                    from,
+                    size
+            );
 
-        return itemRequestDtoList;
+            return itemRequestDtoList;
+        }
+
     }
 
+
+    public ItemRequestDto getItemRequestByIdForOtherUser(long userId, long requestId) {
+        isUser("Не найден пользователь # при запросе заказа на вещь " + requestId, userId);
+
+        ItemRequest itemRequest = repository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Не найден запрос на вещь под id = " + requestId));
+
+        ItemRequestDto itemRequestDto = mapper.toItemRequestDto(itemRequest).toBuilder()
+                .items(itemMapper.toItemDtoList(itemRepository.findByRequest(requestId)))
+                .build();
+
+        log.info("Получен заказ на вещь {}",itemRequestDto);
+
+        return itemRequestDto;
+    }
 
     private void isUser(String textException, long userId) {
         if(!userRepository.existsById(userId)) {

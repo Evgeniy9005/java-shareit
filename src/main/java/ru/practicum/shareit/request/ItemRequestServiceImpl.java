@@ -56,7 +56,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         log.info("Добавлен запрос на вещь {}", newItemRequest);
 
-
         return mapper.toItemRequestDto(newItemRequest);
     }
 
@@ -82,32 +81,24 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     "Не найден пользователь # при запросе запращиваемых вещей в диапозоне от # до #!",userId,from,size);
         }
 
-        Sort sortByDate = Sort.by(Sort.Direction.DESC,"created");
-       // Pageable page = Util.validPageParam(from,size);
-        Pageable page = PageRequest.of(from,size);
-        List<ItemRequest> itemRequestList;
+        Pageable page = Util.validPageParam(from,size);
 
         if(repository.existsByRequester(userId)) {
-
-            /*данный эндпоинт возвращает список запросов,
-            на которые пользователь может ответить.
-            Автор запроса не может ответить на свой же запрос*/
-            /*List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(repository.findAll(page).getContent());
-            log.info("Получены все запросы на вещи в количестве {} в диапозоне от {} до {} без items",
-                    itemRequestDtoList.size(),
-                    from,
-                    size
-            );*/
             return new ArrayList<>();
         } else {
+            List<ItemRequest> requests = Util.getElementsFrom(
+                    repository.findAll(page).getContent(),Util.start(from,size)
+            );
 
-            List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(repository.findAll(page).getContent()).stream()
+            log.info("Получены все ItemRequest в количестве {} в диапозоне от {} до {}",requests.size(),from,size);
+
+            List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(requests).stream()
                     .map(itemRequestDto -> itemRequestDto.toBuilder()
                             .items(itemMapper.toItemDtoList(itemRepository.findByRequest(itemRequestDto.getId())))
                             .build())
                     .collect(Collectors.toList());
 
-            log.info("Получены все запросы на вещи в количестве {} в диапозоне от {} до {}",
+            log.info("Получены все ItemRequestDto в количестве {} в диапозоне от {} до {}",
                     itemRequestDtoList.size(),
                     from,
                     size

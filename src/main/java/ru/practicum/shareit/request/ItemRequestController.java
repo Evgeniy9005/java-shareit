@@ -25,6 +25,7 @@ public class ItemRequestController {
 
     @GetMapping
     Collection<ItemRequestDto> getItemsRequester(@RequestHeader("X-Sharer-User-Id") Long userId) {
+
         return service.getItemsRequester(userId);
     }
 

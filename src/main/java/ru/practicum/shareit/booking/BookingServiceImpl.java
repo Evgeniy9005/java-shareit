@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -20,7 +19,7 @@ import ru.practicum.shareit.util.Util;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 @Slf4j
@@ -72,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
     public Booking setStatus(long bookingId, long userId, Boolean approved) {
 
         if (approved == null) {
-            throw new BadRequestException("Не определен статус одобрения # вещи на бронирование!");
+            throw new BadRequestException("Не определен статус одобрения вещи на бронирование!");
         }
 
         Booking booking = bookingRepository.findById(bookingId)
@@ -127,7 +126,8 @@ public class BookingServiceImpl implements BookingService {
 
 
         if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
-            throw new NotFoundException("Не найден владелец вещи или заказчик # в бронировании # ", userId, booking.getId());
+            throw new NotFoundException(
+                    "Не найден владелец # вещи или заказчик # в бронировании # ", userId , userId, booking.getId());
         }
 
         log.info("Бронирование отправлено {} ",booking);

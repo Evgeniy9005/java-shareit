@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
+import ru.practicum.shareit.util.Util;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -86,8 +88,6 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Не найдена вещь под id = " + itemId));
 
-
-
         log.info("Вернулась вещь {}, пользователя {}", item, userId);
 
         return itemMapper.toItemDto(item);
@@ -97,6 +97,8 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemDto> getItemsByUserId(long userId) {
 
         log.info("Вернуть все вещи пользователя {}", userId);
+
+       // Pageable page = Util.validPageParam()
 
         return itemRepository.findByOwnerId(userId).stream()
                 .map(item -> {

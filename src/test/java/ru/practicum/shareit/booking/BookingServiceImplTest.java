@@ -1,13 +1,10 @@
 package ru.practicum.shareit.booking;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.dao.BookingRepository;
@@ -18,14 +15,13 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.State;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +55,6 @@ class BookingServiceImplTest {
     @BeforeEach
     void start() {
 
-
         bookingSortDescById = (b1,b2) -> Math.toIntExact(b2.getId() - b1.getId());
 
         bookingSortDescByStart = (b1,b2) -> b2.getStart().compareTo(b1.getStart());
@@ -91,39 +86,132 @@ class BookingServiceImplTest {
     @Test
     void addBooking() {
 
-
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1l));
+                new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1l),
+                "Время начала 2024-03-27T08:05:26.121644 бронирования не может быть позже времени окончания 2024-03-26T08:05:26.121644");
 
         when(bookingRepository.save(any(Booking.class)))
                 .thenReturn(bookingList.get(0));
 
+        assertThrows(NotFoundException.class,() -> bookingService.addBooking(
+                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1l),
+                "Не найдена, при бронировании вещь!");
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(itemList.get(0)));
+
+        assertThrows(BadRequestException.class,() -> bookingService.addBooking(
+                new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1l),
+                "Время начала 2024-03-26T08:08:26.178605600 бронирования не может быть в прошлом!");
+
+        assertThrows(BadRequestException.class, () -> bookingService.addBooking(
+                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
+                "Вещь 1 уже забронированна!");
+
+        Item item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
+        assertThrows(NotFoundException.class,() -> bookingService.addBooking(
+                        new CreateBooking(2L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),10L),
+                "Не найден, при бронировании пользователь 10");
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(itemList.get(0).toBuilder().available(true).build()));
+
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(userList.get(1)));
+
         Booking booking = bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1l);
+                new CreateBooking(1L,LocalDateTime.now().plusMinutes(1),LocalDateTime.now().plusDays(1)),2L);
         assertNotNull(booking);
 
+        verify(bookingRepository).save(any(Booking.class));
 
     }
 
     @Test
     void setStatus() {
+        assertThrows(NotFoundException.class,() -> bookingService.setStatus(1L,1L,false),
+                "Не найднно бронирование под id = 1");
+
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(bookingList.get(0).toBuilder().status(Status.WAITING).build()));
+
+        assertThrows(BadRequestException.class,() -> bookingService.setStatus(1L,1L,null),
+                "Не определен статус одобрения вещи на бронирование!");
+
+        assertThrows(NotFoundException.class,() -> bookingService.setStatus(1L,1L,true),
+                "Бронирующий 1 может только отменить бронь!");
+
+        Item itemTest = itemList.get(0).toBuilder()
+                .owner(userList.get(1))//владелец 2 user
+                .build();
+        Booking bookingTest = bookingList.get(0).toBuilder()
+                .item(itemTest)
+                .status(Status.APPROVED)
+                .build();
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(bookingTest));
+
+        assertThrows(BadRequestException.class,
+                () -> bookingService.setStatus(1L,userList.get(1).getId(),true),
+                "Бронирование вещи 1 уже подтвеждено владельцем 2!");
+
+        when(bookingRepository.findById(anyLong()))
+                .thenReturn(Optional.of(bookingTest.toBuilder().status(Status.WAITING).build()));
+
+        when(bookingRepository.save(any()))
+                .thenReturn(bookingTest);
+
+        Booking booking = bookingService.setStatus(1L,userList.get(1).getId(),true);
+        assertNotNull(booking);
+
+        verify(bookingRepository).save(any());
+
     }
 
     @Test
     void getBookingByIdForUserId() {
+        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+                "Не найден пользователь 1 при запросе брони 1 вещи");
 
+        when(userRepository.existsById(anyLong())).thenReturn(true);
+
+        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+         "Не найдено бронирование под id = 1");
+
+        Item item = itemList.get(0).toBuilder().owner(userList.get(1)).build();
+        Booking bookingTest = bookingList.get(0).toBuilder()
+                .item(item)
+                .booker(userList.get(1))
+                .build();
+
+        when(bookingRepository.findById(1L))
+                .thenReturn(Optional.of(bookingTest));
+
+
+        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+                "Не найден владелец 1 вещи или заказчик 1 в бронировании 8");
+
+        when(bookingRepository.findById(1L))
+                .thenReturn(Optional.of(bookingList.get(1)));
+
+        Booking booking = bookingService.getBookingByIdForUserId(1L,1L);
+        assertNotNull(booking);
 
     }
 
     @Test
-    void getBookingsForUser() {
+    void getBookingsOwnerState()  {
 
         long bookerId = 1;
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class, ()->bookingService.getBookingsForUser(bookerId, Data.ALL,0,10));
+        assertThrows(NotFoundException.class, ()->bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10));
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
@@ -192,7 +280,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingsOwnerState() {
+    void getBookingsForUser() {
         long bookerId = 1;
 
         when(userRepository.existsById(anyLong()))
@@ -275,7 +363,7 @@ class BookingServiceImplTest {
         verify(bookingRepository,times(2)).findByBookerIdOrderByStartDesc(anyLong(),any());
         verify(bookingRepository,times(2)).findByBookerIdAndStatusOrderByIdDesc(anyLong(),any(),any());
         verify(bookingRepository).findByBookingCurrentForBooker(anyLong(),any(),any());
-        verify(bookingRepository,times(2)).findByBookerIdAndEndBeforeOrderByEndDesc(anyLong(),any(),any());
+        verify(bookingRepository).findByBookerIdAndEndBeforeOrderByEndDesc(anyLong(),any(),any());
 
         verify(bookingRepository,never()).findAll();
     }

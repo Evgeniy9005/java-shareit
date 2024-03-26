@@ -94,13 +94,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getItemsByUserId(long userId) {
+    public Collection<ItemDto> getItemsByUserId(long userId, int from, int size) {
 
         log.info("Вернуть все вещи пользователя {}", userId);
 
-       // Pageable page = Util.validPageParam()
+        Pageable page = Util.validPageParam(from,size);
 
-        return itemRepository.findByOwnerId(userId).stream()
+        return Util.getElementsFrom(itemRepository.findByOwnerId(userId,page).stream()
                 .map(item -> {
                     List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
                             bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(
@@ -116,7 +116,7 @@ public class ItemServiceImpl implements ItemService {
                                 .build();
 
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()),Util.start(from,size));
     }
 
     @Override
@@ -157,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> search(String text, long userId) {
+    public Collection<ItemDto> search(String text, long userId, int from, int size) {
 
         log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
 
@@ -165,9 +165,11 @@ public class ItemServiceImpl implements ItemService {
         return new ArrayList<>(0);
         }
 
-        return itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text).stream()
+        Pageable page = Util.validPageParam(from,size);
+
+        return Util.getElementsFrom(itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text).stream()
                 .map(item -> itemMapper.toItemDto(item))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()),Util.start(from,size));
     }
 
 

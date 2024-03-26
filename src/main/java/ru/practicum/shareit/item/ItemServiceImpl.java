@@ -167,9 +167,11 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable page = Util.validPageParam(from,size);
 
-        return Util.getElementsFrom(itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text).stream()
+        return Util.getElementsFrom(
+                itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text,page).stream()
                 .map(item -> itemMapper.toItemDto(item))
-                .collect(Collectors.toList()),Util.start(from,size));
+                .collect(Collectors.toList()), Util.start(from,size)
+        );
     }
 
 

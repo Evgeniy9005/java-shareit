@@ -26,7 +26,7 @@ public class Data {
     public static final String DEFAULT = "DEFAULT";
 
 
-    public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects){
+    public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects) {
 
         return (List<T>) IntStream.iterate(1,i -> i+1)
                         .mapToObj(i -> getData(i,t,objects))

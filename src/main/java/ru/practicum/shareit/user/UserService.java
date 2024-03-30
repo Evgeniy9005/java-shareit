@@ -13,6 +13,6 @@ public interface UserService {
 
     UserDto getUser(long userId);
 
-    Collection<UserDto> getUsers();
+    Collection<UserDto> getUsers(int from, int size);
 
 }

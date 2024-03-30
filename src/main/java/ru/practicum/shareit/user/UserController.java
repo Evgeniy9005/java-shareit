@@ -35,8 +35,10 @@ private final UserService userService;
     }
 
     @GetMapping
-    public Collection<UserDto> getUsers() {
-        return userService.getUsers();
+    public Collection<UserDto> getUsers(@RequestParam(defaultValue = "0") int from,
+                                        @RequestParam(defaultValue = "10") int size
+    ) {
+        return userService.getUsers(from,size);
     }
 
 }

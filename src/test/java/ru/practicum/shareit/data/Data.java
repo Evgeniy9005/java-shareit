@@ -1,9 +1,9 @@
 package ru.practicum.shareit.data;
 
 import org.apache.el.stream.Stream;
-import org.hibernate.mapping.Collection;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.booking.dto.CreateBooking;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
@@ -54,10 +54,10 @@ public class Data {
                 if (objects[0].getClass().equals(User.class) &&
                         (objects[1].getClass().equals(Long.class) || objects[1].getClass().equals(Integer.class))) {
 
-                    return (D) new Item(i, "item" + i, "описание вещи " + i, false, (User) objects[0],(long)objects[1]);
+                    return (D) new Item(i, "item" + i, "описание вещи " + i, true, (User) objects[0],(long)objects[1]);
                 }
             }
-           return (D) new Item(i,"item"+i,"описание вещи "+i, false, new User(1,"User","user@mail"),1L);
+           return (D) new Item(i,"item"+i,"описание вещи "+i, true, new User(1,"User","user@mail"),1L);
         }
 
 
@@ -82,8 +82,23 @@ public class Data {
 
         }
 
+        if(type.equals(CreateBooking.class)) {
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+            if(objects.length == 1) {
+                if(objects[0].getClass().equals(Long.class)) {
+                    return (D) new CreateBooking((long) objects[0],LocalDateTime.now().plusSeconds(60),LocalDateTime.now().plusDays(1));
+                }
+            }
+        }
+
         return null;
     }
+
+
 
 
     /*private Class<?> getGenericClass() {
@@ -99,11 +114,18 @@ public class Data {
         return result;
     }*/
 
-    public static <T> void printList(List<T> list,String separator){
+    public static <T> void printList(Collection<T> list, String separator){
 
         System.out.println(separator.repeat(33));
         list.stream().forEach(System.out::println);
         System.out.println(separator.repeat(33));
+    }
+
+    public static <T> void printList(Collection<T> list){
+
+        System.out.println("~*~".repeat(33));
+        list.stream().forEach(System.out::println);
+        System.out.println("~*~".repeat(33));
     }
 
     public static void separato__________________________________r() {

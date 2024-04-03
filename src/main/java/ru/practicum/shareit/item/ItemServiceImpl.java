@@ -94,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> getItemsByUserId(long userId, int from, int size) {
+    public List<ItemDto> getItemsByUserId(long userId, int from, int size) {
 
         log.info("Вернуть все вещи пользователя {}", userId);
 
@@ -157,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> search(String text, long userId, int from, int size) {
+    public List<ItemDto> search(String text, long userId, int from, int size) {
 
         log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
 
@@ -179,7 +179,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (!bookingRepository
                 .existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
-          throw new BadRequestException("У пользователя небыло вещи # в аренде!",itemId);
+          throw new BadRequestException("У пользователя # небыло вещи # в аренде!",itemId,authorId);
         }
 
         Comment comment = Comment.builder()

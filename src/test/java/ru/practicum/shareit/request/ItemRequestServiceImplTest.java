@@ -124,6 +124,7 @@ class ItemRequestServiceImplTest {
 
     }
 
+
     @Test
     void getItemsRequester() {
     }
@@ -133,14 +134,6 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void testAddItemRequest() {
-    }
-
-    @Test
-    void testGetItemsRequester() {
-    }
-
-    @Test
-    void testGetItemsRequesterPagination() {
+    void getItemRequestByIdForOtherUser() {
     }
 }

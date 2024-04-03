@@ -5,6 +5,7 @@ import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface ItemService {
 
@@ -14,11 +15,11 @@ public interface ItemService {
 
     ItemDto getItem(long itemId, long userId);
 
-    Collection<ItemDto> getItemsByUserId(long userId, int from, int size);
+    List<ItemDto> getItemsByUserId(long userId, int from, int size);
 
     ItemDto getItemByRequestUsers(long itemId, long userIdMakesRequest);
 
-    Collection<ItemDto> search(String text, long userId, int from, int size);
+    List<ItemDto> search(String text, long userId, int from, int size);
 
     CommentDto addComment(CreateCommentDto createCommentDto, long itemId, long authorId);
 }

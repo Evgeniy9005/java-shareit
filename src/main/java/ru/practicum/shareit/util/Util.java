@@ -1,5 +1,6 @@
 package ru.practicum.shareit.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -7,34 +8,44 @@ import ru.practicum.shareit.exception.BadRequestException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+@Slf4j
 public class Util {
 
     public static PageRequest validPageParam(int from, int size) {
         validFromSize(from,size);
-
-        if(from > 1) {
-            return PageRequest.of(from/size,size);
+        PageRequest pageRequest;
+        if(from > 0) {
+            pageRequest = PageRequest.of(from/size,size);
+            log.info("Page {}",pageRequest);
+            return pageRequest;
         }
 
-        return PageRequest.of(from,size); //по умолчанию
+        pageRequest = PageRequest.of(from,size);//по умолчанию
+        log.info("Page {}",pageRequest);
+        return PageRequest.of(from,size);
     }
 
 
     public static PageRequest validPageParam(int from, int size, Sort sort) {
 
         validFromSize(from,size);
-
-        if(from > 1) {
-            return PageRequest.of(from/size,size,sort);
+        PageRequest pageRequest;
+        if(from > 0) {
+            pageRequest = PageRequest.of(from/size,size,sort);
+            log.info("Page {}",pageRequest);
+            return pageRequest;
         }
-
-        return PageRequest.of(from,size,sort); //по умолчанию
+        pageRequest = PageRequest.of(from,size,sort); //по умолчанию
+        log.info("Page {}",pageRequest);
+        return pageRequest;
     }
 
     public static int start(int from, int size) {
         validFromSize(from,size);
 
-        if(from > 1) {
+        if(from > 0) {
+            log.info("start {}",from  % size);
             return from  % size;
         }
 

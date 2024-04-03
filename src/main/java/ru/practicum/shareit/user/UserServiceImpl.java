@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.util.Util;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -77,13 +78,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<UserDto> getUsers(int from, int size) {
+    public List<UserDto> getUsers(int from, int size) {
 
         Sort sortById = Sort.by(Sort.Direction.ASC,"id");
 
         Pageable page = Util.validPageParam(from,size,sortById);
 
-        Collection<UserDto> set = Util.getElementsFrom(userRepository.findAll(page).stream()
+        List<UserDto> set = Util.getElementsFrom(userRepository.findAll(page).stream()
                 .map(user -> userMapper.toUserDto(user))
                 .collect(Collectors.toList()),Util.start(from,size));
 

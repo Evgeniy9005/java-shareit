@@ -14,12 +14,11 @@ import ru.practicum.shareit.exception.UnsupportedStatusException;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
-import ru.practicum.shareit.util.Util;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
+import static ru.practicum.shareit.util.Util.*;
 
 
 @Slf4j
@@ -136,56 +135,52 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public Collection<Booking> getBookingsForUser(long userId, String state, int from, int size) { //для ползователя
+    public List<Booking> getBookingsForBooker(long userId, String state, int from, int size) { //для ползователя
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
         }
 
-        Pageable page = Util.validPageParam(from,size);
+        Pageable page = validPageParam(from,size);
 
-        int start = 0;
-
-        if(from > 1) {
-            start = from  % size;
-        }
+        int start = start(from,size);
 
         List<Booking> bookingList;
         switch (state) {
             case "ALL":
-                bookingList = Util.getElementsFrom(
-                        bookingRepository.findByBookerIdOrderByIdDesc(userId,page),start);
+                bookingList = getElementsFrom(bookingRepository.findByBookerIdOrderByIdDesc(userId,page),start);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "FUTURE":
 
-                bookingList = Util.getElementsFrom(
-                        bookingRepository.findByBookerIdOrderByStartDesc(userId,page),start);
+                bookingList = getElementsFrom(bookingRepository.findByBookerIdOrderByStartDesc(userId,page),start);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "WAITING":
-                bookingList = Util.getElementsFrom(
+                bookingList = getElementsFrom(
                         bookingRepository.findByBookerIdAndStatusOrderByIdDesc(userId,Status.WAITING,page),start);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "REJECTED":
-                bookingList = Util.getElementsFrom(
+                bookingList = getElementsFrom(
                         bookingRepository.findByBookerIdAndStatusOrderByIdDesc(userId,Status.REJECTED,page),start);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "CURRENT":
-                bookingList = Util.getElementsFrom(
+                bookingList = getElementsFrom(
                         bookingRepository.findByBookingCurrentForBooker(userId,LocalDateTime.now(),page),start);
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "PAST":
-                bookingList = Util.getElementsFrom(
-                        bookingRepository.findByBookerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now(),page),start);
+                bookingList = getElementsFrom(
+                        bookingRepository.findByBookerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now(),page),
+                        start
+                );
                 log.info("Вернулись брони вещей в количестве = {}, c параметром выборки {}", bookingList.size(), state);
                 return bookingList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
-                bookingList = Util.getElementsFrom(bookingRepository.findByBookerIdOrderByStartDesc(userId,page),start);
+                bookingList = getElementsFrom(bookingRepository.findByBookerIdOrderByStartDesc(userId,page), start);
                 log.info("Вернулись брони вещей в количестве = {}, по умолчанию!", bookingList.size());
                 return bookingList;
         }
@@ -194,53 +189,49 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public Collection<Booking> getBookingsOwnerState(long userId, String state, int from, int size) { //для владельца бронирований
+    public List<Booking> getBookingsOwnerState(long userId, String state, int from, int size) { //для владельца бронирований
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе бронирований этим пользователем", userId);
         }
 
-        Pageable page = Util.validPageParam(from,size);
+        Pageable page = validPageParam(from,size);
 
-        int start = 0;
-
-        if(from > 1) {
-            start = from  % size;
-        }
+        int start = start(from,size);
 
         List<Booking> bookingOwnerList;
         switch (state) {
             case "ALL":
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByIdDesc(userId,page),start);
                 log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, с ",
                         bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "FUTURE":
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByStartDesc(userId,page),start);
                 log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",
                         bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "WAITING":
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.WAITING,page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом WAITING",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "REJECTED":
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.REJECTED,page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "CURRENT":
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByBookingCurrentForOwner(userId,LocalDateTime.now(),page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом CURRENT",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "PAST":
-                bookingOwnerList = Util.getElementsFrom(bookingRepository
+                bookingOwnerList = getElementsFrom(bookingRepository
                         .findByItemOwnerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now(),page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
                         "запрощенных владельцем {} броней со статусом PAST",bookingOwnerList.size(),userId);
@@ -248,7 +239,7 @@ public class BookingServiceImpl implements BookingService {
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
             default:
-                bookingOwnerList = Util.getElementsFrom(
+                bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByStartDesc(userId,page),start
                 );
                 log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, по умолчанию",

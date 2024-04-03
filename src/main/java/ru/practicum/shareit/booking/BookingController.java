@@ -46,14 +46,14 @@ public class BookingController {
     }
 
     @GetMapping
-    public Collection<BookingDto> getBookingsForUser(
+    public Collection<BookingDto> getBookingsForBooker(
             @NotNull @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "default") String state,
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size
     ) {
 
-        return bookingService.getBookingsForUser(userId,state,from,size).stream()
+        return bookingService.getBookingsForBooker(userId,state,from,size).stream()
                 .map(booking -> mapper.toBookingDto(booking))
                 .collect(Collectors.toList());
     }

@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 @Data
@@ -35,6 +36,6 @@ public class ItemDto {
     private final IndicatorBooking nextBooking;
 
     @Builder.Default
-    private final Collection<CommentDto> comments = new ArrayList<>();
+    private final List<CommentDto> comments = new ArrayList<>();
 
 }

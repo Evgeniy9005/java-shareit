@@ -62,19 +62,16 @@ class ShareItTests {
 	private BookingMapper bookingMapper;
 
 
-	List<UserDto> userDtoList;
+	private List<UserDto> userDtoList;
 
-	static List<User> users;
+	private static List<User> users;
 
-	List<ItemDto> itemDtoList;
+	private List<ItemDto> itemDtoList;
 
-	static List<Item> items;
+	private static List<Item> items;
 
-	static List<CreateBooking> createBookingList;
+	private static List<CreateBooking> createBookingList;
 
-	//List<BookingDto> bookingDtoList;
-
-	//List<Booking> bookings;
 
 	@BeforeAll
 	static void data() {
@@ -536,31 +533,95 @@ class ShareItTests {
 	@Test
 	void addItemRequest() {
 		userService.addUser(userDtoList.get(0));
-		userService.addUser(userDtoList.get(1));
-
-		itemService.addItem(itemDtoList.get(0),1);
-		itemService.addItem(itemDtoList.get(1),1);
-		itemService.addItem(itemDtoList.get(2),1);
 
 	ItemRequestDto ird = itemRequestService.addItemRequest(new CreateItemRequest(0,"Дрель"),1L);
-
-
+		assertNotNull(ird);
+		assertEquals(1,ird.getId());
+		assertEquals("Дрель",ird.getDescription());
+		assertEquals(1,ird.getRequester());
+		assertIterableEquals(List.of(),ird.getItems());
 
 	}
 
 	@Test
 	void getItemsRequester() {
+		userService.addUser(userDtoList.get(0));
+		userService.addUser(userDtoList.get(1));
+		userService.addUser(userDtoList.get(2));
+
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Дрель"),1L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Пила"),1L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Чайник"),2L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Клюшка"),3L);
+
+		ItemDto itemDto1 = itemService.addItem(itemDtoList.get(0).toBuilder()
+				.name("Дрель")
+				.description("Дрель бытовая")
+				.requestId(1L)
+				.build(),2);
+
+		ItemDto itemDto2 = itemService.addItem(itemDtoList.get(1).toBuilder()
+				.name("Дрель")
+				.description("Дрель професиональная")
+				.requestId(1L)
+				.build(),3);
+
+		ItemDto itemDto3 = itemService.addItem(itemDtoList.get(2).toBuilder()
+				.name("Дрель")
+				.description("Дрель 3")
+				.requestId(1L)
+				.build(),3);
+
+		List<ItemRequestDto> itemRequestDtoList = itemRequestService.getItemsRequester(1);
+		assertEquals(2,itemRequestDtoList.size());
+		assertEquals(List.of(itemDto1,itemDto2,itemDto3),itemRequestDtoList.get(0).getItems());
 
 	}
 
 	@Test
-	void getItemsRequesterPagination() {
+	void getItemsRequesterPaginationAndGetItemRequestByIdForOtherUser() {
+		userService.addUser(userDtoList.get(0));
+		userService.addUser(userDtoList.get(1));
+		userService.addUser(userDtoList.get(2));
 
-	}
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Дрель"),1L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Пила"),1L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Чайник"),1L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Клюшка"),3L);
+		itemRequestService.addItemRequest(new CreateItemRequest(0,"Клюшка"),3L);
 
-	@Test
-	void getItemRequestByIdForOtherUser() {
+		ItemDto itemDto1 = itemService.addItem(itemDtoList.get(0).toBuilder()
+				.name("Дрель")
+				.description("Дрель бытовая")
+				.requestId(1L)
+				.build(),2);
 
+		ItemDto itemDto2 = itemService.addItem(itemDtoList.get(1).toBuilder()
+				.name("Дрель")
+				.description("Дрель професиональная")
+				.requestId(1L)
+				.build(),3);
+
+		ItemDto itemDto3 = itemService.addItem(itemDtoList.get(2).toBuilder()
+				.name("Дрель")
+				.description("Дрель 3")
+				.requestId(1L)
+				.build(),3);
+
+		List<ItemRequestDto> itemRequestDtoList1 = itemRequestService.getItemsRequesterPagination(2,0,10);
+		assertEquals(5,itemRequestDtoList1.size());
+		assertEquals(List.of(itemDto1,itemDto2,itemDto3),itemRequestDtoList1.get(0).getItems());
+
+		List<ItemRequestDto> itemRequestDtoList2 = itemRequestService.getItemsRequesterPagination(2,1,6);
+		assertEquals(4,itemRequestDtoList2.size());
+
+		ItemRequestDto itemRequestDto1 = itemRequestService.getItemRequestByIdForOtherUser(2,1);
+		assertEquals(1,itemRequestDto1.getId());
+		assertEquals(List.of(itemDto1,itemDto2,itemDto3),itemRequestDto1.getItems());
+
+		ItemRequestDto itemRequestDto2 = itemRequestService.getItemRequestByIdForOtherUser(2,2);
+		assertEquals(2,itemRequestDto2.getId());
+		assertEquals(List.of(),itemRequestDto2.getItems());
 	}
 
 

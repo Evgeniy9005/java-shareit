@@ -71,6 +71,7 @@ class ItemRepositoryTest {
     @Test
     void findByRequest() {
       List<Item> itemList = itemRepository.findByRequest(1l);
+      Data.printList(itemList);
       assertEquals(5,itemList.size());
 
     }

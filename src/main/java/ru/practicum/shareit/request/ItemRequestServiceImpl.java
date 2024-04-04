@@ -54,7 +54,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return mapper.toItemRequestDto(newItemRequest);
     }
 
-    public Collection<ItemRequestDto> getItemsRequester(long userId) {
+    public List<ItemRequestDto> getItemsRequester(long userId) {
 
         isUser("Не найден пользователь # при запросе запращиваемых вещей!",userId);
 
@@ -69,7 +69,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return itemRequestDtoList;
     }
 
-    public Collection<ItemRequestDto> getItemsRequesterPagination(long userId, int from, int size) {
+    public List<ItemRequestDto> getItemsRequesterPagination(long userId, int from, int size) {
 
         if(!userRepository.existsById(userId)) {
             throw new NotFoundException(

@@ -1,9 +1,6 @@
 package ru.practicum.shareit.request.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -16,6 +13,7 @@ import java.util.List;
 @ToString
 @Builder(toBuilder = true)
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ItemRequestDto {
 
     private final long id;

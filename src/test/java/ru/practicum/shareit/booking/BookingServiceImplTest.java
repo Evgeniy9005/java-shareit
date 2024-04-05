@@ -104,11 +104,16 @@ class BookingServiceImplTest {
                 new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1l),
                 "Время начала 2024-03-26T08:08:26.178605600 бронирования не может быть в прошлом!");
 
+        Item item = itemList.get(0).toBuilder().available(false).owner(userList.get(0)).build();
+
+        when(itemRepository.findById(anyLong()))
+                .thenReturn(Optional.of(item));
+
         assertThrows(BadRequestException.class, () -> bookingService.addBooking(
                 new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
                 "Вещь 1 уже забронированна!");
 
-        Item item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
+        item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
@@ -134,7 +139,7 @@ class BookingServiceImplTest {
     @Test
     void setStatus() {
         assertThrows(NotFoundException.class,() -> bookingService.setStatus(1L,1L,false),
-                "Не найднно бронирование под id = 1");
+                "Не найдено бронирование под id = 1");
 
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(bookingList.get(0).toBuilder().status(Status.WAITING).build()));
@@ -218,13 +223,13 @@ class BookingServiceImplTest {
 
         when(bookingRepository.findByItemOwnerIdOrderByIdDesc(anyLong(),any())).thenReturn(bookingList);
 
-        List<Booking> list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10);
+        List<Booking> list = bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10);
         assertNotNull(list);
 
 
         when(bookingRepository.findByItemOwnerIdOrderByStartDesc(anyLong(),any())).thenReturn(bookingList);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.FUTURE,0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,Data.FUTURE,0,10);
         assertNotNull(list);
 
 
@@ -234,7 +239,7 @@ class BookingServiceImplTest {
         when(bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(bookerId,Status.WAITING, PageRequest.of(0,10)))
                 .thenReturn(listWaiting);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.WAITING,0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,Data.WAITING,0,10);
         assertNotNull(list);
         assertEquals(Status.WAITING,list.get(5).getStatus());
 
@@ -244,19 +249,19 @@ class BookingServiceImplTest {
         when(bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(bookerId,Status.REJECTED, PageRequest.of(0,10)))
                 .thenReturn(listRejected);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.REJECTED,0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,Data.REJECTED,0,10);
         assertNotNull(list);
         assertEquals(Status.REJECTED,list.get(5).getStatus());
 
         when(bookingRepository.findByBookingCurrentForOwner(anyLong(), any(), any()))
                 .thenReturn(bookingList);
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.CURRENT,0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,Data.CURRENT,0,10);
         assertNotNull(list);
         assertEquals(8,list.size());
 
         when(bookingRepository.findByItemOwnerIdAndEndBeforeOrderByEndDesc(anyLong(), any(), any()))
                 .thenReturn(bookingList);
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.PAST,0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,Data.PAST,0,10);
         assertNotNull(list);
         assertEquals(8,list.size());
 
@@ -267,7 +272,7 @@ class BookingServiceImplTest {
         when(bookingRepository.findByItemOwnerIdOrderByStartDesc(anyLong(), any()))
                 .thenReturn(bookingList);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,"",0,10);
+        list = bookingService.getBookingsOwnerState(bookerId,"",0,10);
         assertEquals(8,list.size());
 
 
@@ -280,20 +285,20 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getBookingsForUser() {
+    void getBookingsForBooker() {
         long bookerId = 1;
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class, ()->bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10));
+        assertThrows(NotFoundException.class, ()->bookingService.getBookingsForBooker(bookerId, Data.ALL,0,10));
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
 
         when(bookingRepository.findByBookerIdOrderByIdDesc(anyLong(),any())).thenReturn(bookingList);
 
-        List<Booking> list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10);
+        List<Booking> list = bookingService.getBookingsForBooker(bookerId, Data.ALL,0,10);
 
         assertNotNull(list);
         assertEquals(8,list.size());
@@ -302,7 +307,7 @@ class BookingServiceImplTest {
 
         when(bookingRepository.findByBookerIdOrderByStartDesc(anyLong(),any())).thenReturn(bookingList);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.FUTURE,0,10);
+        list = bookingService.getBookingsForBooker(bookerId,Data.FUTURE,0,10);
         list.sort(bookingSortDescByStart);
         assertNotNull(list);
         assertEquals(8,list.size());
@@ -315,7 +320,7 @@ class BookingServiceImplTest {
         when(bookingRepository.findByBookerIdAndStatusOrderByIdDesc(bookerId,Status.WAITING, PageRequest.of(0,10)))
                 .thenReturn(listWaiting);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.WAITING,0,10);
+        list = bookingService.getBookingsForBooker(bookerId,Data.WAITING,0,10);
         list.sort(bookingSortDescById);
         assertNotNull(list);
         assertEquals(8,list.size());
@@ -329,7 +334,7 @@ class BookingServiceImplTest {
         when(bookingRepository.findByBookerIdAndStatusOrderByIdDesc(bookerId,Status.REJECTED, PageRequest.of(0,10)))
                 .thenReturn(listRejected);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.REJECTED,0,10);
+        list = bookingService.getBookingsForBooker(bookerId,Data.REJECTED,0,10);
         list.sort(bookingSortDescById);
         assertNotNull(list);
         assertEquals(8,list.size());
@@ -339,23 +344,23 @@ class BookingServiceImplTest {
 
         when(bookingRepository.findByBookingCurrentForBooker(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
                 .thenReturn(bookingList);
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.CURRENT,0,10);
+        list = bookingService.getBookingsForBooker(bookerId,Data.CURRENT,0,10);
         assertNotNull(list);
         assertEquals(8,list.size());
 
         when(bookingRepository.findByBookerIdAndEndBeforeOrderByEndDesc(anyLong(), any(), any()))
                 .thenReturn(bookingList);
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,Data.PAST,0,10);
+        list = bookingService.getBookingsForBooker(bookerId,Data.PAST,0,10);
         assertNotNull(list);
         assertEquals(8,list.size());
 
         assertThrows(UnsupportedStatusException.class,
-                ()->bookingService.getBookingsOwnerState(bookerId,Data.UNSUPPORTED_STATUS,0,10));
+                ()->bookingService.getBookingsForBooker(bookerId,Data.UNSUPPORTED_STATUS,0,10));
 
         when(bookingRepository.findByBookerIdOrderByStartDesc(anyLong(), any()))
                 .thenReturn(bookingList);
 
-        list = (List<Booking>) bookingService.getBookingsOwnerState(bookerId,"",0,10);
+        list = bookingService.getBookingsForBooker(bookerId,"",0,10);
         assertEquals(8,list.size());
 
 

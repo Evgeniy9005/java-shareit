@@ -17,12 +17,12 @@ public class Util {
         PageRequest pageRequest;
         if(from > 0) {
             pageRequest = PageRequest.of(from/size,size);
-            log.info("Page {}",pageRequest);
+            log.info("{}",pageRequest);
             return pageRequest;
         }
 
         pageRequest = PageRequest.of(from,size);//по умолчанию
-        log.info("Page {}",pageRequest);
+        log.info("{}",pageRequest);
         return PageRequest.of(from,size);
     }
 
@@ -33,11 +33,11 @@ public class Util {
         PageRequest pageRequest;
         if(from > 0) {
             pageRequest = PageRequest.of(from/size,size,sort);
-            log.info("Page {}",pageRequest);
+            log.info("{}",pageRequest);
             return pageRequest;
         }
         pageRequest = PageRequest.of(from,size,sort); //по умолчанию
-        log.info("Page {}",pageRequest);
+        log.info("{}",pageRequest);
         return pageRequest;
     }
 

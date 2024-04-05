@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Не найднно бронирование под id = " + bookingId));
+                .orElseThrow(() -> new NotFoundException("Не найдено бронирование под id = " + bookingId));
 
         Booking setStatusBooking = null;
 

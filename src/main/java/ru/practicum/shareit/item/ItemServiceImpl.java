@@ -24,7 +24,6 @@ import ru.practicum.shareit.util.Util;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
                 itemMapper.toItem(itemDto.toBuilder().owner(
                         userRepository.findById(userId).orElseThrow(
                                 () -> new NotFoundException(
-                                        "при добовлении вещи не найден пользователь под id = " + userId))
+                                        "При добовлении вещи не найден пользователь под id = " + userId))
                 ).build())
         );
 

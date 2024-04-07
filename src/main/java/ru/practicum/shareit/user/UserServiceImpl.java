@@ -12,8 +12,6 @@ import ru.practicum.shareit.patch.Patch;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.util.Util;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

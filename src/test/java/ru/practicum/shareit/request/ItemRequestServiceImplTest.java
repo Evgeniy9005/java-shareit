@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.http.MediaType;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemMapperImpl;
 import ru.practicum.shareit.item.dao.ItemRepository;
@@ -17,6 +18,8 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.util.Util;
+
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.data.Data.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,8 +95,8 @@ class ItemRequestServiceImplTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id",is(itemRequest1.getId()),Long.class))
         .andExpect(jsonPath("$.description",is(itemRequest1.getDescription())))
-        .andExpect(jsonPath("$.requester",is(itemRequest1.getDescription()),Long.class));*/
-
+        .andExpect(jsonPath("$.requester",is(itemRequest1.getDescription()),Long.class));
+*/
     }
 
 

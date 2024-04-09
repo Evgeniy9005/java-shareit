@@ -4,6 +4,8 @@ import org.apache.el.stream.Stream;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.CreateBooking;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
@@ -91,6 +93,20 @@ public class Data {
             if(objects.length == 1) {
                 if(objects[0].getClass().equals(Long.class)) {
                     return (D) new CreateBooking((long) objects[0],LocalDateTime.now().plusSeconds(60),LocalDateTime.now().plusDays(1));
+                }
+            }
+        }
+
+        if(type.equals(Comment.class)) {
+            if(objects.length == 2) {
+                if(objects[0].getClass().equals(Item.class) && objects[1].getClass().equals(User.class)) {
+                    return (D) Comment.builder()
+                            .id(i)
+                            .text("Text"+i)
+                            .item((Item) objects[0])
+                            .author((User) objects[1])
+                            .created(LocalDateTime.of(2024,1,1,1,1,1))
+                            .build();
                 }
             }
         }

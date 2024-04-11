@@ -28,6 +28,14 @@ public class Data {
     public static final String DEFAULT = "DEFAULT";
 
 
+    /**
+     <p><b>- User</b> баз параметров objects;</p>
+     <p><b>- ItemRequest</b> баз параметров objects;</p>
+     <p><b>- Item</b> параметр 1 objects[0] User, параметр 2 objects[1] Long идентификатор requester;</p>
+     <p><b>- Booking</b> параметр 1 objects[0] User, параметр 2 objects[1] Item;</p>
+     <p><b>- CreateBooking</b> параметр 1 objects[0] Long идентификатор Item;</p>
+     <p><b>- Comment</b>  параметр 1 objects[0] Item, параметр 2 objects[1] User.</p>
+     */
     public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects) {
 
         return (List<T>) IntStream.iterate(1,i -> i+1)
@@ -53,13 +61,12 @@ public class Data {
 
         if(type.equals(Item.class)) {
             if(objects.length == 2) {
-                if (objects[0].getClass().equals(User.class) &&
-                        (objects[1].getClass().equals(Long.class) || objects[1].getClass().equals(Integer.class))) {
+                if (objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Long.class)) {
 
                     return (D) new Item(i, "item" + i, "описание вещи " + i, true, (User) objects[0],(long)objects[1]);
                 }
             }
-           return (D) new Item(i,"item"+i,"описание вещи "+i, true, new User(1,"User","user@mail"),1L);
+          // return (D) new Item(i,"item"+i,"описание вещи "+i, true, new User(1,"User","user@mail"),1L);
         }
 
 

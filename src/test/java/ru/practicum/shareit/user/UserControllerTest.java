@@ -58,8 +58,10 @@ class UserControllerTest {
 
     @Test
     void addUser() throws Exception {
+
         UserDto userDto = userDtoList.get(0);
-    when(userService.addUser(any(UserDto.class))).thenReturn(userDto);
+
+        when(userService.addUser(any(UserDto.class))).thenReturn(userDto);
 
         mvc.perform(post("/users")
                 .content(objectMapper.writeValueAsString(userDto))

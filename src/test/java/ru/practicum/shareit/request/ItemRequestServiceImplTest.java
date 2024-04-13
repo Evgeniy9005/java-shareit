@@ -83,20 +83,6 @@ class ItemRequestServiceImplTest {
 
         verify(itemRequestRepository).save(any(ItemRequest.class));
 
-        /*when(itemRequestService.addItemRequest(any(),anyLong()))
-                .thenReturn(itemRequestDto1);
-
-
-        mvc.perform(post("/requests")
-                .content(mapper.writeValueAsString(itemRequestDto1))
-                .characterEncoding(StandardCharsets.UTF_8)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id",is(itemRequest1.getId()),Long.class))
-        .andExpect(jsonPath("$.description",is(itemRequest1.getDescription())))
-        .andExpect(jsonPath("$.requester",is(itemRequest1.getDescription()),Long.class));
-*/
     }
 
 

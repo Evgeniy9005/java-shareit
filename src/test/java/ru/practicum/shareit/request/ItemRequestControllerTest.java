@@ -96,7 +96,8 @@ class ItemRequestControllerTest {
     @Test
     void getItemsRequester() throws Exception {
 
-        when(itemRequestService.getItemsRequester(anyLong())).thenReturn(requestDtoList);
+        when(itemRequestService.getItemsRequester(anyLong()))
+                .thenReturn(requestDtoList);
 
         mvc.perform(get("/requests")
                 .content(objectMapper.writeValueAsString(requestDtoList))

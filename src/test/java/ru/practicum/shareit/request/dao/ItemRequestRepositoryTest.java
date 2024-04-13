@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.dao;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserRepository;
 
 
+import javax.persistence.EntityManager;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +31,12 @@ class ItemRequestRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    List<User> savedUser;
+    @Autowired
+    private EntityManager entityManager;
+
+    private List<User> savedUser;
+
+    private List<ItemRequest> savedItemRequests;
 
 
     private void createItemRequest(int quantity, Type type) {
@@ -46,26 +53,30 @@ class ItemRequestRepositoryTest {
                 .stream()
                 .map(user -> userRepository.save(user))
                 .collect(Collectors.toList());
-        Data.printList(savedUser,"*");
+        Data.printList(savedUser,"-&-");
 
+        savedItemRequests = Data.<ItemRequest>generationData(3,ItemRequest.class)
+                .stream()
+                .map(itemRequest -> itemRequestRepository.save(itemRequest))
+                .collect(Collectors.toList());
+        Data.printList(savedItemRequests,"*^*");
+    }
+
+    @AfterEach
+    void end() {
+        entityManager.createNativeQuery("ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE ITEM_REQUESTS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
     }
 
 
     @Test
-    void saveAndFindByRequester() {
-
-        List<ItemRequest> savedItemRequests = Data.<ItemRequest>generationData(3,ItemRequest.class)
-                .stream()
-                .map(itemRequest -> itemRequestRepository.save(itemRequest))
-                .collect(Collectors.toList());
-        Data.printList(savedItemRequests,"*^");
+    void FindByRequester() {
 
         assertEquals(3,itemRequestRepository.findByRequester(1).size(),
                 "у пользователя 1 3 запроса");
 
         assertEquals(0,itemRequestRepository.findByRequester(2).size(),
                 "у пользователя 2 не запросов");
-
 
     }
 
@@ -132,14 +143,6 @@ class ItemRequestRepositoryTest {
         page = PageRequest.of(3,3);
         Page<ItemRequest> itemRequestPage9 = itemRequestRepository.findAll(page);
         Data.printList(itemRequestPage9.getContent(),"|||");
-
-    }
-
-    @Test
-    void findByRequestAndItems() {
-        createItemRequest(11,ItemRequest.class);
-
-    //Data.printList(itemRequestRepository.findByRequestAndItems(),"?");
 
     }
 

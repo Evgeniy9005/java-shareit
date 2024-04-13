@@ -56,7 +56,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     public List<ItemRequestDto> getItemsRequester(long userId) {
 
-        isUser("Не найден пользователь # при запросе запращиваемых вещей!",userId);
+        isUser("Не найден пользователь # при запросе запрашиваемых вещей!",userId);
 
         List<ItemRequest> itemRequestList = repository.findByRequester(userId);
 

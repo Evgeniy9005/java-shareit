@@ -2,19 +2,15 @@ package ru.practicum.shareit.item.dao;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-
-import java.util.Collection;
 import java.util.List;
 
 
 public interface ItemRepository extends JpaRepository<Item,Long> {
 
-    Collection<Item> findByOwnerId(Long userId);
+   /* Collection<Item> findByOwnerId(Long userId);
 
-    List<Item> searchByIgnoreCaseDescriptionContainingAndAvailableTrue(String text);
+    List<Item> searchByIgnoreCaseDescriptionContainingAndAvailableTrue(String text);*/
 
     List<Item> findByRequest(long requestId);
 
@@ -25,5 +21,5 @@ public interface ItemRepository extends JpaRepository<Item,Long> {
 
     List<Item> searchByIgnoreCaseDescriptionContainingAndAvailableTrue(String text, Pageable pageable);
 
-    List<Item> findByRequest(long requestId, Pageable pageable);
+    //List<Item> findByRequest(long requestId, Pageable pageable);
 }

@@ -48,12 +48,7 @@ class BookingRepositoryTest {
     private List<Booking> savedBooking2;
 
 
-    @AfterEach
-    void end() {
-        entityManager.createNativeQuery("ALTER TABLE BOOKINGS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE ITEMS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
-        entityManager.createNativeQuery("ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
-    }
+
 
     @BeforeEach
     void start() {
@@ -85,6 +80,13 @@ class BookingRepositoryTest {
                 .collect(Collectors.toList());
         printList(savedBooking2,"=+=");
 
+    }
+
+    @AfterEach
+    void end() {
+        entityManager.createNativeQuery("ALTER TABLE BOOKINGS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE ITEMS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
     }
 
     @Test

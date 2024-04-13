@@ -1,18 +1,20 @@
 package ru.practicum.shareit.item.dao;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.data.Data;
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,11 +31,15 @@ class ItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    @Autowired
+    private EntityManager entityManager;
+
     List<User> savedUser;
 
     List<ItemRequest> savedItemRequest;
 
     List<Item> savedItems;
+
 
     @BeforeEach
     void start() {
@@ -41,39 +47,52 @@ class ItemRepositoryTest {
                 .stream()
                 .map(user -> userRepository.save(user))
                 .collect(Collectors.toList());
-        Data.printList(savedUser,"*");
+        Data.printList(savedUser,"*$*");
 
         savedItemRequest = Data.<ItemRequest>generationData(2,ItemRequest.class)
                 .stream()
                 .map(itemRequest -> itemRequestRepository.save(itemRequest))
                 .collect(Collectors.toList());
-        Data.printList(savedItemRequest,">");
+        Data.printList(savedItemRequest,">>>");
 
         savedItems = Data.<Item>generationData(5,Item.class,savedUser.get(0),1L)
                 .stream()
                 .map(item -> itemRepository.save(item))
                 .collect(Collectors.toList());
-        Data.printList(savedItems,"^");
+        Data.printList(savedItems,"^^^");
 
+        savedItems = Data.<Item>generationData(3,Item.class,savedUser.get(1),1L)
+                .stream()
+                .map(item -> itemRepository.save(item.toBuilder().id(0).build()))
+                .collect(Collectors.toList());
+        Data.printList(savedItems,"_=_");
     }
 
+    @AfterEach
+    void end() {
+        entityManager.createNativeQuery("ALTER TABLE ITEMS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE USERS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE ITEM_REQUESTS ALTER COLUMN ID RESTART WITH 1").executeUpdate();
+    }
 
     @Test
     void findByOwnerId() {
-
+        Pageable pageable = PageRequest.of(0,10);
+        List<Item> items = itemRepository.findByOwnerId(1L,pageable);
+        assertEquals(5,items.size());
     }
 
     @Test
     void searchByIgnoreCaseDescriptionContainingAndAvailableTrue() {
-
+        Pageable pageable = PageRequest.of(0,10);
+        List<Item> items = itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue("вещ",pageable);
+        assertEquals(8,items.size());
     }
 
     @Test
     void findByRequest() {
       List<Item> itemList = itemRepository.findByRequest(1l);
-      Data.printList(itemList);
-      assertEquals(5,itemList.size());
-
+      assertEquals(8,itemList.size());
     }
 
 }

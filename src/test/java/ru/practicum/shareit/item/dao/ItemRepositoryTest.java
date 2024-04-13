@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.data.Data;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class ItemRepositoryTest {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -32,6 +34,9 @@ class ItemRepositoryTest {
     private ItemRepository itemRepository;
 
     @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
     private EntityManager entityManager;
 
     List<User> savedUser;
@@ -39,6 +44,8 @@ class ItemRepositoryTest {
     List<ItemRequest> savedItemRequest;
 
     List<Item> savedItems;
+
+    List<Comment> savedComments;
 
 
     @BeforeEach
@@ -61,11 +68,18 @@ class ItemRepositoryTest {
                 .collect(Collectors.toList());
         Data.printList(savedItems,"^^^");
 
-        savedItems = Data.<Item>generationData(3,Item.class,savedUser.get(1),1L)
+        Data.<Item>generationData(3,Item.class,savedUser.get(1),1L)
                 .stream()
-                .map(item -> itemRepository.save(item.toBuilder().id(0).build()))
+                .map(item -> savedItems.add(itemRepository.save(item.toBuilder().id(0).build())))
                 .collect(Collectors.toList());
         Data.printList(savedItems,"_=_");
+
+        savedComments = Data.<Comment>generationData(3,Comment.class,savedItems.get(0),savedUser.get(1))
+                .stream()
+                .map(comment -> commentRepository.save(comment))
+                .collect(Collectors.toList());
+        Data.printList(savedComments,"ccc");
+
     }
 
     @AfterEach
@@ -93,6 +107,12 @@ class ItemRepositoryTest {
     void findByRequest() {
       List<Item> itemList = itemRepository.findByRequest(1l);
       assertEquals(8,itemList.size());
+    }
+
+    @Test
+    void findByItemId() {
+       List<Comment> commentList = commentRepository.findByItemId(1);
+       assertEquals(3,commentList.size());
     }
 
 }

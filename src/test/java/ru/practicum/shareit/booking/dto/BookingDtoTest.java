@@ -26,9 +26,10 @@ class BookingDtoTest {
     @Autowired
     private JacksonTester<BookingDto> jacksonTester;
 
+    @Autowired
+    private JacksonTester<CreateBooking> jacksonTesterCreateBooking;
 
     private BookingMapper bookingMapper;
-
 
     List<Booking> bookingList;
 
@@ -36,18 +37,24 @@ class BookingDtoTest {
 
     List<Item> itemList;
 
+    List<CreateBooking> createBookingList;
+
+    LocalDateTime start;
+    LocalDateTime end;
+
     @BeforeEach
     void start() {
         bookingMapper = new BookingMapperImpl();
         userList = Data.<User>generationData(1,User.class);
         itemList = Data.<Item>generationData(1,Item.class,userList.get(0),1L);
         bookingList = Data.<Booking>generationData(1,Booking.class,userList.get(0),itemList.get(0));
+        createBookingList = Data.<CreateBooking>generationData(1,CreateBooking.class,1);
+        start = LocalDateTime.of(2024,1,1,1,1,1);
+        end = LocalDateTime.of(2024,1,1,1,1,1);
     }
 
     @Test
     void testBookingDto() throws Exception {
-        LocalDateTime start = LocalDateTime.of(2024,1,1,1,1,1);
-        LocalDateTime end = LocalDateTime.of(2024,1,1,1,1,1);
 
         BookingDto bookingDto = bookingMapper.toBookingDto(bookingList.get(0)).toBuilder()
                 .start(start)
@@ -59,7 +66,6 @@ class BookingDtoTest {
         User booker = bookingDto.getBooker();
 
         JsonContent<BookingDto> result = jacksonTester.write(bookingDto);
-        System.out.println(result);
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo(start.toString());
@@ -72,6 +78,16 @@ class BookingDtoTest {
         assertThat(result).extractingJsonPathStringValue("$.booker.email").isEqualTo("user1@mail");
         assertThat(result).extractingJsonPathStringValue("$.status").isEqualTo("APPROVED");
 
+    }
+
+    @Test
+    void testCreateBooking() throws Exception {
+        CreateBooking createBooking = new CreateBooking(1L,start,end);
+        JsonContent<CreateBooking> result = jacksonTesterCreateBooking.write(createBooking);
+
+        assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
+        assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo(start.toString());
+        assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo(end.toString());
     }
 
 }

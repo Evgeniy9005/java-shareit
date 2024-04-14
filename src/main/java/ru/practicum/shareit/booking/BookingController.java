@@ -6,12 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.CreateBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
-
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 
 @RestController

@@ -17,7 +17,6 @@ import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserRepository;
-
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -64,7 +63,7 @@ class BookingServiceImplTest {
         userList = Data.generationData(2,User.class);
         Data.printList(userList,">>>");
 
-        itemList = Data.generationData(2,Item.class);
+        itemList = Data.generationData(2,Item.class,userList.get(0),1L);
         Data.printList(itemList,"===");
 
         bookingList = Data.generationData(8,Booking.class,userList.get(0),itemList.get(0));
@@ -87,21 +86,21 @@ class BookingServiceImplTest {
     void addBooking() {
 
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1l),
+                new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1L),
                 "Время начала 2024-03-27T08:05:26.121644 бронирования не может быть позже времени окончания 2024-03-26T08:05:26.121644");
 
         when(bookingRepository.save(any(Booking.class)))
                 .thenReturn(bookingList.get(0));
 
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1l),
+                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
                 "Не найдена, при бронировании вещь!");
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemList.get(0)));
 
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1l),
+                new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1L),
                 "Время начала 2024-03-26T08:08:26.178605600 бронирования не может быть в прошлом!");
 
         Item item = itemList.get(0).toBuilder().available(false).owner(userList.get(0)).build();
@@ -179,12 +178,12 @@ class BookingServiceImplTest {
 
     @Test
     void getBookingByIdForUserId() {
-        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingByIdForUserId(1L,1L),
                 "Не найден пользователь 1 при запросе брони 1 вещи");
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
-        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingByIdForUserId(1L,1L),
          "Не найдено бронирование под id = 1");
 
         Item item = itemList.get(0).toBuilder().owner(userList.get(1)).build();
@@ -197,7 +196,7 @@ class BookingServiceImplTest {
                 .thenReturn(Optional.of(bookingTest));
 
 
-        assertThrows(NotFoundException.class, ()-> bookingService.getBookingByIdForUserId(1L,1L),
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingByIdForUserId(1L,1L),
                 "Не найден владелец 1 вещи или заказчик 1 в бронировании 8");
 
         when(bookingRepository.findById(1L))
@@ -216,7 +215,7 @@ class BookingServiceImplTest {
         when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class, ()->bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingsOwnerState(bookerId, Data.ALL,0,10));
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
@@ -267,7 +266,7 @@ class BookingServiceImplTest {
 
 
         assertThrows(UnsupportedStatusException.class,
-                ()->bookingService.getBookingsOwnerState(bookerId,Data.UNSUPPORTED_STATUS,0,10));
+                () -> bookingService.getBookingsOwnerState(bookerId,Data.UNSUPPORTED_STATUS,0,10));
 
         when(bookingRepository.findByItemOwnerIdOrderByStartDesc(anyLong(), any()))
                 .thenReturn(bookingList);
@@ -291,7 +290,7 @@ class BookingServiceImplTest {
         when(userRepository.existsById(anyLong()))
                 .thenReturn(false);
 
-        assertThrows(NotFoundException.class, ()->bookingService.getBookingsForBooker(bookerId, Data.ALL,0,10));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingsForBooker(bookerId, Data.ALL,0,10));
 
         when(userRepository.existsById(anyLong()))
                 .thenReturn(true);
@@ -355,7 +354,7 @@ class BookingServiceImplTest {
         assertEquals(8,list.size());
 
         assertThrows(UnsupportedStatusException.class,
-                ()->bookingService.getBookingsForBooker(bookerId,Data.UNSUPPORTED_STATUS,0,10));
+                () -> bookingService.getBookingsForBooker(bookerId,Data.UNSUPPORTED_STATUS,0,10));
 
         when(bookingRepository.findByBookerIdOrderByStartDesc(anyLong(), any()))
                 .thenReturn(bookingList);

@@ -126,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (booking.getItem().getOwner().getId() != userId && booking.getBooker().getId() != userId) {
             throw new NotFoundException(
-                    "Не найден владелец # вещи или заказчик # в бронировании # ", userId , userId, booking.getId());
+                    "Не найден владелец # вещи или заказчик # в бронировании # ", userId, userId, booking.getId());
         }
 
         log.info("Бронирование отправлено {} ",booking);

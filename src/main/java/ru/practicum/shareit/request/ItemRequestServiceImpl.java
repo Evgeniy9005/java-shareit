@@ -14,10 +14,8 @@ import ru.practicum.shareit.request.dto.CreateItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.util.Util;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,14 +69,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     public List<ItemRequestDto> getItemsRequesterPagination(long userId, int from, int size) {
 
-        if(!userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
                     "Не найден пользователь # при запросе запращиваемых вещей в диапозоне от # до #!",userId,from,size);
         }
 
         Pageable page = Util.validPageParam(from,size);
 
-        if(repository.existsByRequester(userId)) {
+        if (repository.existsByRequester(userId)) {
             return new ArrayList<>();
         } else {
             List<ItemRequest> requests = Util.getElementsFrom(
@@ -121,7 +119,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private void isUser(String textException, long userId) {
-        if(!userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException(textException,userId);
         }
     }

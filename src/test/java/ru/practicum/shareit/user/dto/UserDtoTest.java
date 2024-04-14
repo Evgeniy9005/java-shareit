@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
@@ -17,7 +16,7 @@ class UserDtoTest {
 
     @Test
     void testItemDto() throws Exception {
-        UserDto userDto = new UserDto(1,"name","email@mail");
+        UserDto userDto = new UserDto(1L,"name","email@mail");
 
         JsonContent<UserDto> result = jacksonTester.write(userDto);
 

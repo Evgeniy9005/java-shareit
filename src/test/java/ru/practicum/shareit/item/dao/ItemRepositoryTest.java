@@ -14,7 +14,6 @@ import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
-
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -105,7 +104,7 @@ class ItemRepositoryTest {
 
     @Test
     void findByRequest() {
-      List<Item> itemList = itemRepository.findByRequest(1l);
+      List<Item> itemList = itemRepository.findByRequest(1L);
       assertEquals(8,itemList.size());
     }
 

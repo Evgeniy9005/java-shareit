@@ -7,7 +7,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingService;
 import ru.practicum.shareit.booking.Status;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.CreateBooking;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.item.ItemMapper;
@@ -24,7 +23,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -90,14 +88,16 @@ class ShareItTests {
 	}
 
 
-	@Test @Order(1)
+	@Order(1)
+	@Test
 	void addUser() {
 		UserDto userDto = userService.addUser(userDtoList.get(0));
 		assertNotNull(userDto);
 		assertEquals(1,userDto.getId());
 	}
 
-	@Test @Order(2)
+	@Order(2)
+	@Test
 	void upUser() {
 		UserDto userDto = userService.addUser(userDtoList.get(0));
 		assertEquals("User1",userDto.getName());
@@ -110,7 +110,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(3)
+	@Order(3)
+	@Test
 	void deleteUserGetUsers() {
 		userService.addUser(userDtoList.get(0));
 		userService.addUser(userDtoList.get(1));
@@ -123,7 +124,8 @@ class ShareItTests {
 		assertIterableEquals(List.of(),orderUserId(userService.getUsers(0,4)));
 	}
 
-	@Test @Order(4)
+	@Order(4)
+	@Test
 	void getUser() {
 		userService.addUser(userDtoList.get(0));
 		UserDto saveUserDto = userService.addUser(userDtoList.get(1));
@@ -141,7 +143,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(5)
+	@Order(5)
+	@Test
 	void getUsers() {
 		userService.addUser(userDtoList.get(0));
 		userService.addUser(userDtoList.get(1));
@@ -159,7 +162,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(6)
+	@Order(6)
+	@Test
 	void addItem() {
 		userService.addUser(userDtoList.get(0));
 
@@ -169,8 +173,8 @@ class ShareItTests {
 		assertEquals(1,itemDto.getId());
 	}
 
-
-	@Test @Order(7)
+	@Order(7)
+	@Test
 	void upItem() {
 		userService.addUser(userDtoList.get(0));
 		UserDto userDto = userService.addUser(userDtoList.get(1));
@@ -190,7 +194,8 @@ class ShareItTests {
 		assertEquals(userMapper.toUser(userDto),newItemDto.getOwner());
 	}
 
-	@Test @Order(8)
+	@Order(8)
+	@Test
 	void getItem() {
 		User owner1 = userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		User owner2 = userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -211,7 +216,8 @@ class ShareItTests {
 		assertEquals(owner2,itemDto2.getOwner());
 	}
 
-	@Test @Order(9)
+	@Order(9)
+	@Test
 	void getItemsByUserId() {
 		userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -226,7 +232,8 @@ class ShareItTests {
 		assertIterableEquals(List.of(1L),orderItemId(itemService.getItemsByUserId(2,0,10)));
 	}
 
-	@Test @Order(10)
+	@Order(10)
+	@Test
 	void addComment() {
 		userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -273,7 +280,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(11)
+	@Order(11)
+	@Test
 	void getItemByRequestUsers() {
 		long userId1 = userMapper.toUser(userService.addUser(userDtoList.get(0))).getId();
 		long userId2 = userMapper.toUser(userService.addUser(userDtoList.get(1))).getId();
@@ -326,8 +334,8 @@ class ShareItTests {
 		return booking;
 	}
 
-
-	@Test @Order(12)
+	@Order(12)
+	@Test
 	void searchItems() {
 		userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -343,8 +351,8 @@ class ShareItTests {
 		assertEquals(1,itemDtos2.size());
 	}
 
-
-	@Test @Order(13)
+	@Order(13)
+	@Test
 	void addBooking() {
 		userService.addUser(userDtoList.get(0));
 		User booker = userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -358,7 +366,8 @@ class ShareItTests {
 		assertEquals(Status.WAITING,booking.getStatus());
 	}
 
-	@Test @Order(14)
+	@Order(14)
+	@Test
 	void setStatus() {
 		User owner = userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		User booker = userMapper.toUser(userService.addUser(userDtoList.get(1)));
@@ -373,7 +382,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(15)
+	@Order(15)
+	@Test
 	void getBookingByIdForUserId() {
 		userService.addUser(userDtoList.get(3));
 		userService.addUser(userDtoList.get(2));
@@ -388,22 +398,23 @@ class ShareItTests {
 		bookingService.addBooking(createBookingList.get(2).toBuilder().itemId(3L).build(),2L);
 
 
-		Booking booking1 = bookingService.getBookingByIdForUserId(1L,2l);
+		Booking booking1 = bookingService.getBookingByIdForUserId(1L,2L);
 		assertNotNull(booking1);
 		assertEquals(1,booking1.getId());
-		Booking booking2 = bookingService.getBookingByIdForUserId(2L,2l);
+		Booking booking2 = bookingService.getBookingByIdForUserId(2L,2L);
 		assertNotNull(booking2);
 		assertEquals(2,booking2.getId());
-		Booking booking3 = bookingService.getBookingByIdForUserId(3L,2l);
+		Booking booking3 = bookingService.getBookingByIdForUserId(3L,2L);
 		assertNotNull(booking3);
 		assertEquals(3,booking3.getId());
 
-		Booking booking31 = bookingService.getBookingByIdForUserId(3L,1l);
+		Booking booking31 = bookingService.getBookingByIdForUserId(3L,1L);
 		assertNotNull(booking31);
 		assertEquals(3,booking31.getId());
 	}
 
-	@Test @Order(16)
+	@Order(16)
+	@Test
 	void getBookingsForBooker() {
 		userService.addUser(userDtoList.get(0));
 		userService.addUser(userDtoList.get(1));
@@ -470,7 +481,8 @@ class ShareItTests {
 
 	}
 
-	@Test @Order(17)
+	@Order(17)
+	@Test
 	void getBookingsForOwnerItems() {
 		userService.addUser(userDtoList.get(0));
 		userService.addUser(userDtoList.get(1));
@@ -528,8 +540,7 @@ class ShareItTests {
 
 	}
 
-
-
+	@Order(18)
 	@Test
 	void addItemRequest() {
 		userService.addUser(userDtoList.get(0));
@@ -543,6 +554,7 @@ class ShareItTests {
 
 	}
 
+	@Order(19)
 	@Test
 	void getItemsRequester() {
 		userService.addUser(userDtoList.get(0));
@@ -578,6 +590,7 @@ class ShareItTests {
 
 	}
 
+	@Order(20)
 	@Test
 	void getItemsRequesterPaginationAndGetItemRequestByIdForOtherUser() {
 		userService.addUser(userDtoList.get(0));

@@ -70,7 +70,7 @@ class ItemRequestRepositoryTest {
 
 
     @Test
-    void FindByRequester() {
+    void findByRequester() {
 
         assertEquals(3,itemRequestRepository.findByRequester(1).size(),
                 "у пользователя 1 3 запроса");

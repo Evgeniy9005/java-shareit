@@ -9,15 +9,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.dto.UserDto;
-
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,7 +73,7 @@ class UserControllerTest {
     }
 
     @Test
-    void upUser() throws Exception{
+    void upUser() throws Exception {
         UserDto userDto = userDtoList.get(0);
         when(userService.upUser(any(UserDto.class),anyLong())).thenReturn(userDto);
 

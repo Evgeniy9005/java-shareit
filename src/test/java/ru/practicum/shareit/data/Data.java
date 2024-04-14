@@ -1,15 +1,13 @@
 package ru.practicum.shareit.data;
 
-import org.apache.el.stream.Stream;
+
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.CreateBooking;
-import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
-
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,19 +36,19 @@ public class Data {
      */
     public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects) {
 
-        return (List<T>) IntStream.iterate(1,i -> i+1)
-                        .mapToObj(i -> getData(i,t,objects))
+        return (List<T>) IntStream.iterate(1,i -> i + 1)
+                        .mapToObj(i -> getData(i, t, objects))
                         .limit(createObjects)
                         .collect(Collectors.toList());
     }
 
     private static <D> D getData(int i, Type type, Object... objects) {
 
-        if(type.equals(User.class)) {
-            return (D) new User(i,"User"+i,"user"+i+"@mail");
+        if (type.equals(User.class)) {
+            return (D) new User(i,"User" + i,"user" + i + "@mail");
         }
 
-        if(type.equals(ItemRequest.class)) {
+        if (type.equals(ItemRequest.class)) {
             return (D) ItemRequest.builder()
                     .id(i)
                     .requester(1L)
@@ -59,20 +57,19 @@ public class Data {
                     .build();
         }
 
-        if(type.equals(Item.class)) {
-            if(objects.length == 2) {
+        if (type.equals(Item.class)) {
+            if (objects.length == 2) {
                 if (objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Long.class)) {
 
                     return (D) new Item(i, "item" + i, "описание вещи " + i, true, (User) objects[0],(long)objects[1]);
                 }
             }
-          // return (D) new Item(i,"item"+i,"описание вещи "+i, true, new User(1,"User","user@mail"),1L);
         }
 
 
-        if(type.equals(Booking.class)) {
-            if(objects.length == 2) {
-                if(objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Item.class)) {
+        if (type.equals(Booking.class)) {
+            if (objects.length == 2) {
+                if (objects[0].getClass().equals(User.class) && objects[1].getClass().equals(Item.class)) {
                     try {
                         Thread.sleep(20);
                     } catch (InterruptedException e) {
@@ -91,25 +88,27 @@ public class Data {
 
         }
 
-        if(type.equals(CreateBooking.class)) {
+        if (type.equals(CreateBooking.class)) {
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
                 System.out.println(e);
             }
-            if(objects.length == 1) {
-                if(objects[0].getClass().equals(Long.class)) {
-                    return (D) new CreateBooking((long) objects[0],LocalDateTime.now().plusSeconds(60),LocalDateTime.now().plusDays(1));
+            if (objects.length == 1) {
+                if (objects[0].getClass().equals(Long.class)) {
+                    return (D) new CreateBooking((long) objects[0],
+                            LocalDateTime.now().plusSeconds(60),
+                            LocalDateTime.now().plusDays(1));
                 }
             }
         }
 
-        if(type.equals(Comment.class)) {
-            if(objects.length == 2) {
-                if(objects[0].getClass().equals(Item.class) && objects[1].getClass().equals(User.class)) {
+        if (type.equals(Comment.class)) {
+            if (objects.length == 2) {
+                if (objects[0].getClass().equals(Item.class) && objects[1].getClass().equals(User.class)) {
                     return (D) Comment.builder()
                             .id(i)
-                            .text("Text"+i)
+                            .text("Text" + i)
                             .item((Item) objects[0])
                             .author((User) objects[1])
                             .created(LocalDateTime.of(2024,1,1,1,1,1))
@@ -121,31 +120,13 @@ public class Data {
         return null;
     }
 
-
-
-
-    /*private Class<?> getGenericClass() {
-        Class<?> result = null;
-        Type type = this.getClass().getGenericSuperclass();
-
-        if(type instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) type;
-            Type[] fieldArgTypes = pt.getActualTypeArguments();
-            result = (Class<?>) fieldArgTypes[0];
-        }
-
-        return result;
-    }*/
-
-    public static <T> void printList(Collection<T> list, String separator){
-
+    public static <T> void printList(Collection<T> list, String separator) {
         System.out.println(separator.repeat(33));
         list.stream().forEach(System.out::println);
         System.out.println(separator.repeat(33));
     }
 
-    public static <T> void printList(Collection<T> list){
-
+    public static <T> void printList(Collection<T> list) {
         System.out.println("~*~".repeat(33));
         list.stream().forEach(System.out::println);
         System.out.println("~*~".repeat(33));

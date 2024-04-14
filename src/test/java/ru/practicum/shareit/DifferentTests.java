@@ -23,10 +23,10 @@ public class DifferentTests {
 
     @Test
     void test3() {
-        System.out.println(5/2);
-        System.out.println(8%3);
-        System.out.println(1/10);
-        System.out.println(9%10);
+        System.out.println(5 / 2);
+        System.out.println(8 % 3);
+        System.out.println(1 / 10);
+        System.out.println(9 % 10);
     }
 
 }

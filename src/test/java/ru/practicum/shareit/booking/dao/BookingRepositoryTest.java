@@ -9,7 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.Booking;
-
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.item.dao.ItemRepository;
@@ -17,7 +16,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.util.Util;
-
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -139,7 +137,7 @@ class BookingRepositoryTest {
         Pageable page = Util.validPageParam(from,size);
         int start = Util.start(from,size);
 
-        if(start == 0) {
+        if (start == 0) {
             return bookingRepository.findByItemOwnerIdOrderByStartDesc(1, page);
 
         } else {
@@ -172,16 +170,16 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,3);
         List<Booking> bookingList = bookingRepository.findByBookerIdOrderByIdDesc(1,pageable);
         assertEquals(3,bookingList.size());
-        assertEquals(List.of(8l,7L,6L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L),bookingsId(bookingList));
     }
 
     @Test
     void findByBookerIdOrderByStartDesc() {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository.findByBookerIdOrderByStartDesc(1,pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
         List<Booking> bookingList1 = bookingRepository.findByBookerIdOrderByStartDesc(2,pageable);
-        assertEquals(List.of(11l,10L,9L),bookingsId(bookingList1));
+        assertEquals(List.of(11L,10L,9L),bookingsId(bookingList1));
 
     }
 
@@ -189,14 +187,14 @@ class BookingRepositoryTest {
     void findByItemOwnerIdOrderByIdDesc() {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository.findByItemOwnerIdOrderByIdDesc(1,pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     @Test
     void findByItemOwnerIdOrderByStartDesc() {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository.findByItemOwnerIdOrderByStartDesc(1,pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     @Test
@@ -204,7 +202,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByBookerIdAndStatusOrderByIdDesc(1,Status.APPROVED,pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     @Test
@@ -212,7 +210,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByBookingCurrentForBooker(1, LocalDateTime.now(),pageable);
-        assertEquals(List.of(1l,2L,3L,4L,5L,6L,7L,8L),bookingsId(bookingList));
+        assertEquals(List.of(1L,2L,3L,4L,5L,6L,7L,8L),bookingsId(bookingList));
     }
 
     @Test
@@ -220,7 +218,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByBookerIdAndEndBeforeOrderByEndDesc(1, LocalDateTime.now().plusDays(1),pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     @Test
@@ -228,7 +226,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByItemOwnerIdAndStatusOrderByIdDesc(1, Status.APPROVED, pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     @Test
@@ -236,7 +234,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByBookingCurrentForOwner(1, LocalDateTime.now(), pageable);
-        assertEquals(List.of(1l,2L,3L,4L,5L,6L,7L,8L),bookingsId(bookingList));
+        assertEquals(List.of(1L,2L,3L,4L,5L,6L,7L,8L),bookingsId(bookingList));
     }
 
     @Test
@@ -244,7 +242,7 @@ class BookingRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         List<Booking> bookingList = bookingRepository
                 .findByItemOwnerIdAndEndBeforeOrderByEndDesc(1, LocalDateTime.now().plusDays(1), pageable);
-        assertEquals(List.of(8l,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
+        assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
     private List<Long> bookingsId(List<Booking> bookingList) {

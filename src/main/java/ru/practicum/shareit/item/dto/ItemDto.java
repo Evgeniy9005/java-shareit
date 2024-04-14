@@ -4,11 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.item.booking.IndicatorBooking;
 import ru.practicum.shareit.user.User;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 

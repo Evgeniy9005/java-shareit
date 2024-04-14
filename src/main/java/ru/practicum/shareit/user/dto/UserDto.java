@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Builder(toBuilder = true)
 public class UserDto {
 
-    private final long id;
+    private final Long id;
 
     private final String name;
 

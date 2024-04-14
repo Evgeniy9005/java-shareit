@@ -8,29 +8,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.item.booking.IndicatorBooking;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.ItemRequestMapper;
-import ru.practicum.shareit.request.ItemRequestMapperImpl;
-import ru.practicum.shareit.request.ItemRequestService;
-import ru.practicum.shareit.request.dto.CreateItemRequest;
-import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.*;
-import ru.practicum.shareit.user.dto.UserDto;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -39,10 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.practicum.shareit.data.Data.generationData;
 import static ru.practicum.shareit.data.Data.printList;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 
 @WebMvcTest(controllers = ItemController.class)

@@ -44,6 +44,7 @@ class ItemRequestDtoTest {
         created = LocalDateTime.of(2024,1,1,1,1,1);
 
     }
+
     @Test
     void testItemRequestDto() throws Exception {
         ItemRequestDto itemRequestDto = new ItemRequestDto(1,

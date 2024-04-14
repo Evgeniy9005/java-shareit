@@ -73,8 +73,7 @@ class ItemServiceImplTest {
         userList = generationData(2, User.class);
         printList(userList,">>>");
 
-
-        itemList = generationData(2, Item.class);
+        itemList = generationData(2, Item.class,userList.get(0),1L);
         itemDtoList = itemMapper.toItemDtoList(itemList);
         printList(itemDtoList,"===");
 

@@ -2,8 +2,6 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.*;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

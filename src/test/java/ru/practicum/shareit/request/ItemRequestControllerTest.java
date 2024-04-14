@@ -10,29 +10,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.request.dto.CreateItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.user.*;
-import ru.practicum.shareit.user.dto.UserDto;
-
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static ru.practicum.shareit.data.Data.generationData;
 import static ru.practicum.shareit.data.Data.printList;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerTest {
@@ -55,6 +44,7 @@ class ItemRequestControllerTest {
     private ItemRequestDto itemRequestDto1;
 
     private ItemRequestDto itemRequestDto2;
+
     @BeforeEach
     void start() {
         requestDtoList = Data.<ItemRequest>generationData(2, ItemRequest.class).stream()
@@ -66,6 +56,7 @@ class ItemRequestControllerTest {
         itemRequestDto2 = requestDtoList.get(1);
 
     }
+
     @Test
     void addItemRequest() throws Exception {
 

@@ -39,8 +39,8 @@ public class Patch {
                .available(available == null ? updated.getAvailable() : available)
                .owner(owner == null ? updated.getOwner() : owner)
                .requestId(request == null ? updated.getRequestId() : request)
-               .lastBooking(request == null ? updated.getLastBooking() : lastBooking)
-               .nextBooking(request == null ? updated.getNextBooking() : nextBooking)
+               .lastBooking(lastBooking == null ? updated.getLastBooking() : lastBooking)
+               .nextBooking(nextBooking == null ? updated.getNextBooking() : nextBooking)
                .build();
     }
 }

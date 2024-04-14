@@ -68,7 +68,32 @@ class PatchTest {
                 .nextBooking(indicatorBooking2)
                 .build();
 
+        ItemDto itemDtoPatch = ItemDto.builder()
+                .id(2L)
+                .name("name_patch")
+                .description("description_patch")
+                .requestId(3L)
+                .available(false)
+                .lastBooking(new IndicatorBooking(3,3))
+                .nextBooking(new IndicatorBooking(4,4))
+                .build();
+
         ItemDto itemDtoPatchAllNull = ItemDto.builder().build();
+
+        ItemDto itemDtoPatchIdNull = itemDtoPatch.toBuilder().id(null).build();
+
+
+        ItemDto itemDtoPatchNameNull = itemDtoPatch.toBuilder().name(null).build();
+
+        ItemDto itemDtoPatchDescriptionNull = itemDtoPatch.toBuilder().description(null).build();
+
+        ItemDto itemDtoPatchRequestIdNull = itemDtoPatch.toBuilder().requestId(null).build();
+
+        ItemDto itemDtoPatchAvailableNull = itemDtoPatch.toBuilder().available(null).build();
+
+        ItemDto itemDtoPatchLastBookingNull = itemDtoPatch.toBuilder().lastBooking(null).build();
+
+        ItemDto itemDtoPatchNextBookingNull = itemDtoPatch.toBuilder().nextBooking(null).build();
 
         ItemDto itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchAllNull);
         assertEquals(1,itemDtoTest.getId());
@@ -79,8 +104,67 @@ class PatchTest {
         assertEquals(indicatorBooking1.getBookerId(),itemDtoTest.getLastBooking().getBookerId());
         assertEquals(indicatorBooking2.getBookerId(),itemDtoTest.getNextBooking().getBookerId());
 
-        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchAllNull);
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchIdNull);
+        assertEquals(1,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
 
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchNameNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
 
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchDescriptionNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
+
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchRequestIdNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(2L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
+
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchAvailableNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertTrue(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
+
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchLastBookingNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(1,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(4,itemDtoTest.getNextBooking().getBookerId());
+
+        itemDtoTest = Patch.patchItemDto(itemDto,itemDtoPatchNextBookingNull);
+        assertEquals(2,itemDtoTest.getId());
+        assertEquals("name_patch",itemDtoTest.getName());
+        assertEquals("description_patch",itemDtoTest.getDescription());
+        assertFalse(itemDtoTest.getAvailable());
+        assertEquals(3L,itemDtoTest.getRequestId());
+        assertEquals(3,itemDtoTest.getLastBooking().getBookerId());
+        assertEquals(2,itemDtoTest.getNextBooking().getBookerId());
     }
 }

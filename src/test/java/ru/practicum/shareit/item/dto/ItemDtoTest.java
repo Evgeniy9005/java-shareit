@@ -63,7 +63,7 @@ class ItemDtoTest {
         ItemDto itemDto = itemMapper.toItemDto(itemList.get(0));
 
         JsonContent<ItemDto> result = jacksonTesterItemDto.write(itemDto);
-        System.out.println(result);
+
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("item1");

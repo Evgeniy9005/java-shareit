@@ -27,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
+import static ru.practicum.shareit.data.Data.START_DATE;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {
@@ -83,27 +84,30 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void addBooking() {
-
-        LocalDateTime localDateTime = LocalDateTime.of(2024,1,1,1,1);
-
+    void addBookingError() {
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                        new CreateBooking(1L,localDateTime,localDateTime),1L),
+                        new CreateBooking(1L,START_DATE,START_DATE),1L),
                 "Время начала 2024-01-01T01:01 бронирования не может быть " +
                         "равно времени окончания 2024-01-01T01:01");
+    }
 
+    @Test
+    void addBookingError1() {
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1L),
+                        new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1L),
                 "Время начала 2024-03-27T08:05:26.121644 бронирования не может быть " +
                         "позже времени окончания 2024-03-26T08:05:26.121644");
+    }
 
-        when(bookingRepository.save(any(Booking.class)))
-                .thenReturn(bookingList.get(0));
-
+    @Test
+    void addBookingError2() {
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
+                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
                 "Не найдена, при бронировании вещь!");
+    }
 
+    @Test
+    void addBookingError3() {
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemList.get(0)));
 
@@ -112,19 +116,25 @@ class BookingServiceImplTest {
                 "Не может владелец вещи создать бронь на свою вещь!");
 
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1L),
+                        new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1L),
                 "Время начала 2024-03-26T08:08:26.178605600 бронирования не может быть в прошлом!");
+    }
 
+    @Test
+    void addBookingError4() {
         Item item = itemList.get(0).toBuilder().available(false).owner(userList.get(0)).build();
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
 
         assertThrows(BadRequestException.class, () -> bookingService.addBooking(
-                new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
+                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
                 "Вещь 1 уже забронирована!");
+    }
 
-        item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
+    @Test
+    void addBookingError5() {
+        Item item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(item));
@@ -132,12 +142,18 @@ class BookingServiceImplTest {
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
                         new CreateBooking(2L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),10L),
                 "Не найден, при бронировании пользователь 10");
+    }
+
+    @Test
+    void addBooking() {
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemList.get(0).toBuilder().available(true).build()));
 
         when(userRepository.findById(anyLong()))
                 .thenReturn(Optional.of(userList.get(1)));
+
+        when(bookingRepository.save(any(Booking.class))).thenReturn(bookingList.get(0));
 
         Booking booking = bookingService.addBooking(
                 new CreateBooking(1L,LocalDateTime.now().plusMinutes(1),LocalDateTime.now().plusDays(1)),2L);

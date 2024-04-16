@@ -54,7 +54,7 @@ class ItemRequestServiceImplTest {
         userList = generationData(2,User.class);
         printList(userList,">>>");
 
-        itemList = generationData(2, Item.class);
+        itemList = generationData(2, Item.class, userList.get(0),1L);
         printList(itemList,"===");
 
         itemRequestList = generationData(3,ItemRequest.class);
@@ -62,12 +62,17 @@ class ItemRequestServiceImplTest {
 
     }
 
+    @Test
+    void  returnNullMapper() {
+        List<ItemRequest> itemRequests = null;
+        assertNull(itemRequestMapper.toItemRequestDtoList(itemRequests));
+    }
 
     @Test
     void addItemRequest() {
         assertThrows(NotFoundException.class,
                 () -> itemRequestService.addItemRequest(any(),1L),
-                "Не найден пользователь 1 при добовлении запроса на вещь!");
+                "Не найден пользователь 1 при добавлении запроса на вещь!");
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 
@@ -92,14 +97,13 @@ class ItemRequestServiceImplTest {
 
         assertIterableEquals(itemRequestMapper.toItemRequestDtoList(itemRequestList),itemRequestDtoList);
 
-
     }
 
     @Test
     void getItemsRequesterPagination() {
         assertThrows(NotFoundException.class,
-                () -> itemRequestService.getItemsRequester(1L),
-                "Не найден пользователь 1 при запросе запращиваемых вещей!");
+                () -> itemRequestService.getItemsRequesterPagination(1L,0,10),
+                "Не найден пользователь 1 при запросе запрашиваемых вещей в диапазоне от 0 до 10!");
 
         when(userRepository.existsById(anyLong())).thenReturn(true);
 

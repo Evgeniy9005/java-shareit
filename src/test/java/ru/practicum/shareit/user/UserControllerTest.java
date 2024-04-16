@@ -43,7 +43,6 @@ class UserControllerTest {
 
     private UserMapper userMapper = new UserMapperImpl();
 
-
     @BeforeEach
     void start() {
         userList = generationData(2, User.class);
@@ -57,6 +56,13 @@ class UserControllerTest {
     void addUser() throws Exception {
 
         UserDto userDto = userDtoList.get(0);
+
+        mvc.perform(post("/user")
+                        .content(objectMapper.writeValueAsString(userDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
 
         when(userService.addUser(any(UserDto.class))).thenReturn(userDto);
 
@@ -75,6 +81,7 @@ class UserControllerTest {
     @Test
     void upUser() throws Exception {
         UserDto userDto = userDtoList.get(0);
+
         when(userService.upUser(any(UserDto.class),anyLong())).thenReturn(userDto);
 
         mvc.perform(patch("/users/1")
@@ -133,4 +140,5 @@ class UserControllerTest {
                 .andExpect(jsonPath("$[1].name",is(userDto2.getName())))
                 .andExpect(jsonPath("$[1].email",is(userDto2.getEmail())));
     }
+
 }

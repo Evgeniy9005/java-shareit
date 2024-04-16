@@ -37,7 +37,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional
     public ItemRequestDto addItemRequest(CreateItemRequest createRequest, long userId) {
 
-        isUser("Не найден пользователь # при добовлении запроса на вещь!",userId);
+        isUser("Не найден пользователь # при добавлении запроса на вещь!",userId);
 
         ItemRequest itemRequest = ItemRequest.builder()
                 .description(createRequest.getDescription())
@@ -71,7 +71,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(
-                    "Не найден пользователь # при запросе запращиваемых вещей в диапозоне от # до #!",userId,from,size);
+                    "Не найден пользователь # при запросе запрашиваемых вещей в диапазоне от # до #!",userId,from,size);
         }
 
         Pageable page = Util.validPageParam(from,size);
@@ -83,7 +83,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                     repository.findAll(page).getContent(),Util.start(from,size)
             );
 
-            log.info("Получены все ItemRequest в количестве {} в диапозоне от {} до {}",requests.size(),from,size);
+            log.info("Получены все ItemRequest в количестве {} в диапазоне от {} до {}",requests.size(),from,size);
 
             List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(requests).stream()
                     .map(itemRequestDto -> itemRequestDto.toBuilder()
@@ -91,7 +91,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                             .build())
                     .collect(Collectors.toList());
 
-            log.info("Получены все ItemRequestDto в количестве {} в диапозоне от {} до {}",
+            log.info("Получены все ItemRequestDto в количестве {} в диапазоне от {} до {}",
                     itemRequestDtoList.size(),
                     from,
                     size

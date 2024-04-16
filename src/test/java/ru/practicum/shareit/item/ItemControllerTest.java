@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -28,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.data.Data.generationData;
 import static ru.practicum.shareit.data.Data.printList;
-
 
 
 @WebMvcTest(controllers = ItemController.class)
@@ -80,6 +78,7 @@ class ItemControllerTest {
 
         itemDto1 = itemDtoList.get(0).toBuilder()
                 .lastBooking(new IndicatorBooking(1,1))
+                .nextBooking(new IndicatorBooking(2,2))
                 .build();
 
         itemDto2 = itemDtoList.get(1).toBuilder()
@@ -101,6 +100,7 @@ class ItemControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
         .andExpect(jsonPath("$.id",is(1),Integer.class))
         .andExpect(jsonPath("$.name",is(itemDto1.getName())))
         .andExpect(jsonPath("$.description",is(itemDto1.getDescription())))
@@ -108,7 +108,8 @@ class ItemControllerTest {
         .andExpect(jsonPath("$.requestId",is(1)))
         .andExpect(jsonPath("$.lastBooking.id",is(1)))
         .andExpect(jsonPath("$.lastBooking.bookerId",is(1)))
-        .andExpect(jsonPath("$.nextBooking",is(itemDto1.getNextBooking())));
+        .andExpect(jsonPath("$.nextBooking.id",is(2)))
+        .andExpect(jsonPath("$.nextBooking.bookerId",is(2)));
 
     }
 
@@ -130,7 +131,8 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.requestId",is(1)))
                 .andExpect(jsonPath("$.lastBooking.id",is(1)))
                 .andExpect(jsonPath("$.lastBooking.bookerId",is(1)))
-                .andExpect(jsonPath("$.nextBooking",is(itemDto1.getNextBooking())));
+                .andExpect(jsonPath("$.nextBooking.id",is(2)))
+                .andExpect(jsonPath("$.nextBooking.bookerId",is(2)));
     }
 
     @Test
@@ -152,13 +154,15 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.requestId",is(1)))
                 .andExpect(jsonPath("$.lastBooking.id",is(1)))
                 .andExpect(jsonPath("$.lastBooking.bookerId",is(1)))
-                .andExpect(jsonPath("$.nextBooking",is(itemDto1.getNextBooking())))
+                .andExpect(jsonPath("$.nextBooking.id",is(2)))
+                .andExpect(jsonPath("$.nextBooking.bookerId",is(2)))
                 .andExpect(jsonPath("$.comments",is(itemDto1.getComments())));
     }
 
     @Test
     void getItemsByUserId() throws Exception {
-        when(itemService.getItemsByUserId(anyLong(),any(Integer.class),any(Integer.class))).thenReturn(itemDtoList);
+        when(itemService.getItemsByUserId(anyLong(),any(Integer.class),any(Integer.class)))
+                .thenReturn(List.of(itemDto1,itemDto2));
 
         mvc.perform(get("/items")
                         .content(objectMapper.writeValueAsString(itemDtoList))
@@ -172,20 +176,23 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description",is(itemDto1.getDescription())))
                 .andExpect(jsonPath("$[0].available",is(itemDto1.getAvailable())))
                 .andExpect(jsonPath("$[0].requestId",is(1)))
-                .andExpect(jsonPath("$[0].lastBooking").value(itemDto1.getNextBooking()))
-                .andExpect(jsonPath("$[0].nextBooking",is(itemDto1.getNextBooking())))
+                .andExpect(jsonPath("$[0].lastBooking.id").value(1))
+                .andExpect(jsonPath("$[0].lastBooking.bookerId",is(1)))
+                .andExpect(jsonPath("$[0].nextBooking.id",is(2)))
+                .andExpect(jsonPath("$[0].nextBooking.bookerId",is(2)))
+                .andExpect(jsonPath("$[0].comments").isArray())
                 .andExpect(jsonPath("$[1].id",is(2),Integer.class))
                 .andExpect(jsonPath("$[1].name",is(itemDto2.getName())))
                 .andExpect(jsonPath("$[1].description",is(itemDto2.getDescription())))
                 .andExpect(jsonPath("$[1].available",is(itemDto2.getAvailable())))
-                .andExpect(jsonPath("$[1].requestId",is(1)))
-                .andExpect(jsonPath("$[1].lastBooking").value(itemDto2.getNextBooking()))
-                .andExpect(jsonPath("$[1].nextBooking",is(itemDto2.getNextBooking())));
+                .andExpect(jsonPath("$[1].requestId",is(1)));
+
     }
 
     @Test
     void search() throws Exception {
-        when(itemService.search(anyString(),anyLong(),any(Integer.class),any(Integer.class))).thenReturn(itemDtoList);
+        when(itemService.search(anyString(),anyLong(),any(Integer.class),any(Integer.class)))
+                .thenReturn(itemDtoList);
 
         mvc.perform(get("/items/search")
                         .content(objectMapper.writeValueAsString(itemDtoList))
@@ -200,15 +207,17 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$[0].description",is(itemDto1.getDescription())))
                 .andExpect(jsonPath("$[0].available",is(itemDto1.getAvailable())))
                 .andExpect(jsonPath("$[0].requestId",is(1)))
-                .andExpect(jsonPath("$[0].lastBooking").value(itemDto1.getNextBooking()))
-                .andExpect(jsonPath("$[0].nextBooking",is(itemDto1.getNextBooking())))
+                .andExpect(jsonPath("$[0].lastBooking").isEmpty())
+                .andExpect(jsonPath("$[0].nextBooking").isEmpty())
+                .andExpect(jsonPath("$[0].comments").isArray())
                 .andExpect(jsonPath("$[1].id",is(2),Integer.class))
                 .andExpect(jsonPath("$[1].name",is(itemDto2.getName())))
                 .andExpect(jsonPath("$[1].description",is(itemDto2.getDescription())))
                 .andExpect(jsonPath("$[1].available",is(itemDto2.getAvailable())))
                 .andExpect(jsonPath("$[1].requestId",is(1)))
-                .andExpect(jsonPath("$[1].lastBooking").value(itemDto2.getNextBooking()))
-                .andExpect(jsonPath("$[1].nextBooking",is(itemDto2.getNextBooking())));
+                .andExpect(jsonPath("$[1].lastBooking").isEmpty())
+                .andExpect(jsonPath("$[1].nextBooking").isEmpty())
+                .andExpect(jsonPath("$[1].comments").isArray());
 
     }
 

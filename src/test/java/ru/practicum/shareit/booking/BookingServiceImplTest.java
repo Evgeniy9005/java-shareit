@@ -85,9 +85,17 @@ class BookingServiceImplTest {
     @Test
     void addBooking() {
 
+        LocalDateTime localDateTime = LocalDateTime.of(2024,1,1,1,1);
+
+        assertThrows(BadRequestException.class,() -> bookingService.addBooking(
+                        new CreateBooking(1L,localDateTime,localDateTime),1L),
+                "Время начала 2024-01-01T01:01 бронирования не может быть " +
+                        "равно времени окончания 2024-01-01T01:01");
+
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
                 new CreateBooking(1L,LocalDateTime.now().plusDays(1),LocalDateTime.now()),1L),
-                "Время начала 2024-03-27T08:05:26.121644 бронирования не может быть позже времени окончания 2024-03-26T08:05:26.121644");
+                "Время начала 2024-03-27T08:05:26.121644 бронирования не может быть " +
+                        "позже времени окончания 2024-03-26T08:05:26.121644");
 
         when(bookingRepository.save(any(Booking.class)))
                 .thenReturn(bookingList.get(0));
@@ -98,6 +106,10 @@ class BookingServiceImplTest {
 
         when(itemRepository.findById(anyLong()))
                 .thenReturn(Optional.of(itemList.get(0)));
+
+        assertThrows(NotFoundException.class,() -> bookingService.addBooking(
+                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
+                "Не может владелец вещи создать бронь на свою вещь!");
 
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
                 new CreateBooking(1L,LocalDateTime.now().minusDays(1),LocalDateTime.now().plusDays(1)),1L),
@@ -110,7 +122,7 @@ class BookingServiceImplTest {
 
         assertThrows(BadRequestException.class, () -> bookingService.addBooking(
                 new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
-                "Вещь 1 уже забронированна!");
+                "Вещь 1 уже забронирована!");
 
         item = itemList.get(1).toBuilder().available(true).owner(userList.get(1)).build();
 
@@ -161,7 +173,7 @@ class BookingServiceImplTest {
 
         assertThrows(BadRequestException.class,
                 () -> bookingService.setStatus(1L,userList.get(1).getId(),true),
-                "Бронирование вещи 1 уже подтвеждено владельцем 2!");
+                "Бронирование вещи 1 уже подтверждено владельцем 2!");
 
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(bookingTest.toBuilder().status(Status.WAITING).build()));
@@ -172,7 +184,9 @@ class BookingServiceImplTest {
         Booking booking = bookingService.setStatus(1L,userList.get(1).getId(),true);
         assertNotNull(booking);
 
-        verify(bookingRepository).save(any());
+        bookingService.setStatus(1L,userList.get(1).getId(),false);
+
+        verify(bookingRepository,times(2)).save(any());
 
     }
 

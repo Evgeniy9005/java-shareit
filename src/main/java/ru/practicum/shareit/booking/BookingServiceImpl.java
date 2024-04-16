@@ -46,7 +46,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
         if (!item.isAvailable()) {
-            throw new BadRequestException("Вещь # уже забронированна!",createBooking.getItemId());
+            throw new BadRequestException("Вещь # уже забронирована!",createBooking.getItemId());
         }
 
     Booking booking = Booking.builder()
@@ -85,12 +85,12 @@ public class BookingServiceImpl implements BookingService {
             if (approved) { //и approved = true
                 if (booking.getStatus().equals(Status.APPROVED)) {
                     throw new BadRequestException(
-                            "Бронирование вещи # уже подтвеждено владельцем #!",booking.getItem().getId(),owner
+                            "Бронирование вещи # уже подтверждено владельцем #!",booking.getItem().getId(),owner
                     );
                 }
-               setStatusBooking = booking.toBuilder().status(Status.APPROVED).build();//подтверждение бронирования влаельцем вещи
+               setStatusBooking = booking.toBuilder().status(Status.APPROVED).build();//подтверждение бронирования владельцем вещи
             } else { //и approved = false
-               setStatusBooking = booking.toBuilder().status(Status.REJECTED).build();//отклонение бронирования влаельцем вещи
+               setStatusBooking = booking.toBuilder().status(Status.REJECTED).build();//отклонение бронирования владельцем вещи
             }
         }
 
@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public List<Booking> getBookingsForBooker(long userId, String state, int from, int size) { //для ползователя
+    public List<Booking> getBookingsForBooker(long userId, String state, int from, int size) { //для пользователя
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Не найден пользователь # при запросе всех бронирований вещей", userId);
         }
@@ -203,38 +203,38 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByIdDesc(userId,page),start);
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, с ",
+                log.info("Вернулись брони вещей в количестве {}, запрошенных владельцем {} броней, с ",
                         bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "FUTURE":
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByStartDesc(userId,page),start);
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней ",
+                log.info("Вернулись брони вещей в количестве {}, запрошенных владельцем {} броней ",
                         bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "WAITING":
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.WAITING,page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
-                        "запрощенных владельцем {} броней со статусом WAITING",bookingOwnerList.size(),userId);
+                        "запрошенных владельцем {} броней со статусом WAITING",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "REJECTED":
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdAndStatusOrderByIdDesc(userId,Status.REJECTED,page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
-                        "запрощенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
+                        "запрошенных владельцем {} броней со статусом REJECTED",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "CURRENT":
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByBookingCurrentForOwner(userId,LocalDateTime.now(),page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
-                        "запрощенных владельцем {} броней со статусом CURRENT",bookingOwnerList.size(),userId);
+                        "запрошенных владельцем {} броней со статусом CURRENT",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "PAST":
                 bookingOwnerList = getElementsFrom(bookingRepository
                         .findByItemOwnerIdAndEndBeforeOrderByEndDesc(userId,LocalDateTime.now(),page),start);
                 log.info("Вернулись брони вещей в количестве {}, " +
-                        "запрощенных владельцем {} броней со статусом PAST",bookingOwnerList.size(),userId);
+                        "запрошенных владельцем {} броней со статусом PAST",bookingOwnerList.size(),userId);
                 return bookingOwnerList;
             case "UNSUPPORTED_STATUS":
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
@@ -242,7 +242,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingOwnerList = getElementsFrom(
                         bookingRepository.findByItemOwnerIdOrderByStartDesc(userId,page),start
                 );
-                log.info("Вернулись брони вещей в количестве {}, запрощенных владельцем {} броней, по умолчанию",
+                log.info("Вернулись брони вещей в количестве {}, запрошенных владельцем {} броней, по умолчанию",
                         bookingOwnerList.size(),userId);
                 return bookingOwnerList;
 

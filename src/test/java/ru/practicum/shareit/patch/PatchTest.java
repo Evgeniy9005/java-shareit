@@ -1,7 +1,6 @@
 package ru.practicum.shareit.patch;
 
 import org.junit.jupiter.api.Test;
-import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.item.booking.IndicatorBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -49,7 +48,6 @@ class PatchTest {
         assertEquals(3,userDtoTest.getId());
         assertEquals("newUser",userDtoTest.getName());
         assertEquals("newemail@mail",userDtoTest.getEmail());
-
 
     }
 

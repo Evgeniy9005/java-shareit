@@ -24,7 +24,9 @@ public class Data {
     public static final String PAST = "PAST";
     public static final String UNSUPPORTED_STATUS = "UNSUPPORTED_STATUS";
     public static final String DEFAULT = "DEFAULT";
-
+    public static final LocalDateTime CREATED_DATE = LocalDateTime.of(2024,1,1,1,1);
+    public static final LocalDateTime START_DATE = LocalDateTime.of(2024,2,2,2,2);
+    public static final LocalDateTime END_DATE = LocalDateTime.of(2024,2,2,2,2);
 
     /**
      <p><b>- User</b> баз параметров objects;</p>

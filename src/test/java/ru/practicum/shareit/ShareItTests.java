@@ -1,8 +1,11 @@
 package ru.practicum.shareit;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingService;
@@ -30,7 +33,7 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.data.Data.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ShareItTests {
@@ -59,6 +62,8 @@ class ShareItTests {
 	@Autowired
 	private BookingMapper bookingMapper;
 
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	private List<UserDto> userDtoList;
 
@@ -70,6 +75,8 @@ class ShareItTests {
 
 	private static List<CreateBooking> createBookingList;
 
+	@Autowired
+	TestRestTemplate template;
 
 	@BeforeAll
 	static void data() {
@@ -87,6 +94,10 @@ class ShareItTests {
 
 	}
 
+	@Test
+	void testError1() {
+
+	}
 
 	@Order(1)
 	@Test
@@ -94,6 +105,7 @@ class ShareItTests {
 		UserDto userDto = userService.addUser(userDtoList.get(0));
 		assertNotNull(userDto);
 		assertEquals(1,userDto.getId());
+
 	}
 
 	@Order(2)
@@ -637,6 +649,62 @@ class ShareItTests {
 		assertEquals(List.of(),itemRequestDto2.getItems());
 	}
 
+
+	@Order(21)
+	@Test
+	void testError() throws Exception {
+
+		ResponseEntity<User> response = template.postForEntity("/users",UserDto.builder().build(), User.class);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
+		ResponseEntity<User> response1 = template.getForEntity("/users/99", User.class);
+		assertEquals(HttpStatus.NOT_FOUND, response1.getStatusCode());
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+		headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+		headers.set("X-Sharer-User-Id", "1");
+
+		HttpEntity entity = new HttpEntity(headers);
+
+		userService.addUser(userDtoList.get(0));
+
+		ResponseEntity<Booking> response2 = template.exchange("/bookings?state={state}",
+				HttpMethod.GET,
+				entity,
+				Booking.class,
+				"UNSUPPORTED_STATUS"
+		);
+		assertEquals(HttpStatus.BAD_REQUEST, response2.getStatusCode());
+
+		userService.addUser(userDtoList.get(1));
+
+		ItemDto itemDtoNew = itemDtoList.get(0).toBuilder()
+				.available(false)
+				.build();
+
+		itemService.addItem(itemDtoNew,2);
+
+		HttpHeaders headersBooking = new HttpHeaders();
+		headersBooking.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+		headersBooking.setContentType(MediaType.APPLICATION_JSON);
+		headersBooking.set("X-Sharer-User-Id", "1");
+
+
+		String body = objectMapper.writeValueAsString(createBookingList.get(0));
+		HttpEntity<String> request = new HttpEntity<>(body,headersBooking);
+		ResponseEntity<Booking> response3 = template.postForEntity("/bookings",
+				request,
+				Booking.class);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response3.getStatusCode());
+
+		ResponseEntity<String> response4 = template.postForEntity("/bookings",
+				new HttpEntity<>(body,new HttpHeaders()),
+				String.class);
+
+		assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, response4.getStatusCode());
+	}
 
 	private List<Long> orderBookingId(List<Booking> objects) {
 		return objects.stream().map(b -> b.getId()).collect(Collectors.toList());

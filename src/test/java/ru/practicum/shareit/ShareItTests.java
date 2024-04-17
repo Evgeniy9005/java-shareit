@@ -271,24 +271,25 @@ class ShareItTests {
 		bookingService.addBooking(createBooking2, 3L);
 		assertEquals(Status.APPROVED,bookingService.setStatus(2,1,true).getStatus());
 
-		CommentDto c1 = itemService.addComment(new CreateCommentDto(1L,"коментарий 1"),1,2);
-		CommentDto c2 = itemService.addComment(new CreateCommentDto(2L,"коментарий 2"),1,2);
-		CommentDto c3 = itemService.addComment(new CreateCommentDto(3L,"коментарий 3"),1,3);
+		sleep(30);
+		CommentDto c1 = itemService.addComment(new CreateCommentDto(1L,"комментарий 1"),1,2);
+		CommentDto c2 = itemService.addComment(new CreateCommentDto(2L,"комментарий 2"),1,2);
+		CommentDto c3 = itemService.addComment(new CreateCommentDto(3L,"комментарий 3"),1,3);
 
 		assertEquals(1,c1.getId());
 		assertEquals("User2",c1.getAuthorName());
 		assertEquals(1,c1.getItem().getId());
-		assertEquals("коментарий 1",c1.getText());
+		assertEquals("комментарий 1",c1.getText());
 
 		assertEquals(2,c2.getId());
 		assertEquals("User2",c2.getAuthorName());
 		assertEquals(1,c2.getItem().getId());
-		assertEquals("коментарий 2",c2.getText());
+		assertEquals("комментарий 2",c2.getText());
 
 		assertEquals(3,c3.getId());
 		assertEquals("User3",c3.getAuthorName());
 		assertEquals(1,c3.getItem().getId());
-		assertEquals("коментарий 3",c3.getText());
+		assertEquals("комментарий 3",c3.getText());
 
 	}
 

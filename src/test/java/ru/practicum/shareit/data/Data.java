@@ -35,6 +35,7 @@ public class Data {
      <p><b>- CreateBooking</b> параметр 1 objects[0] Long идентификатор Item;</p>
      <p><b>- Comment</b>  параметр 1 objects[0] Item, параметр 2 objects[1] User.</p>
      */
+
     public static <T> List<T> generationData(Integer createObjects, Type t, Object... objects) {
 
         return (List<T>) IntStream.iterate(1,i -> i + 1)

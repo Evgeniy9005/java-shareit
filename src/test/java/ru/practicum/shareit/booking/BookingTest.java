@@ -78,7 +78,8 @@ class BookingTest {
     @Test
     void testToString() {
         Booking booking = booking1.toBuilder().start(START_DATE).end(END_DATE).build();
-        assertEquals("Booking(id=1, start=2024-02-02T02:02, end=2024-02-02T02:02, item=Item(id=1, " +
+
+        assertEquals("Booking(id=1, start=2024-02-02T02:02, end=2024-03-03T03:03, item=Item(id=1, " +
                         "name=item1, description=описание вещи 1, available=true, owner=User(id=1, name=User1," +
                         " email=user1@mail), request=1), booker=User(id=1, name=User1, email=user1@mail), " +
                         "status=APPROVED)", booking.toString());

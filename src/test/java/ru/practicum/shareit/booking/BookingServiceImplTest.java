@@ -102,7 +102,7 @@ class BookingServiceImplTest {
     @Test
     void addBookingError2() {
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
-                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
+                        new CreateBooking(1L,LocalDateTime.now().plusMinutes(1),LocalDateTime.now().plusDays(1)),1L),
                 "Не найдена, при бронировании вещь!");
     }
 
@@ -112,7 +112,7 @@ class BookingServiceImplTest {
                 .thenReturn(Optional.of(itemList.get(0)));
 
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
-                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),1L),
+                        new CreateBooking(1L,LocalDateTime.now().plusMinutes(1),LocalDateTime.now().plusDays(1)),1L),
                 "Не может владелец вещи создать бронь на свою вещь!");
 
         assertThrows(BadRequestException.class,() -> bookingService.addBooking(
@@ -128,7 +128,7 @@ class BookingServiceImplTest {
                 .thenReturn(Optional.of(item));
 
         assertThrows(BadRequestException.class, () -> bookingService.addBooking(
-                        new CreateBooking(1L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),2L),
+                        new CreateBooking(1L,LocalDateTime.now().plusSeconds(1),LocalDateTime.now().plusDays(1)),2L),
                 "Вещь 1 уже забронирована!");
     }
 
@@ -140,7 +140,7 @@ class BookingServiceImplTest {
                 .thenReturn(Optional.of(item));
 
         assertThrows(NotFoundException.class,() -> bookingService.addBooking(
-                        new CreateBooking(2L,LocalDateTime.now(),LocalDateTime.now().plusDays(1)),10L),
+                        new CreateBooking(2L,LocalDateTime.now().plusMinutes(1),LocalDateTime.now().plusDays(1)),10L),
                 "Не найден, при бронировании пользователь 10");
     }
 

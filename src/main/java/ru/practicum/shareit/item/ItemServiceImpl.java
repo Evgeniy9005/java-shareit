@@ -99,23 +99,6 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable page = Util.validPageParam(from,size);
 
-        /*return Util.getElementsFrom(itemRepository.findByOwnerId(userId,page).stream()
-                .map(item -> {
-                    List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                            bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(
-                                            item.getId(),userId,Status.APPROVED)
-                    );
-
-                    log.info("При возврате всех вещей пользователя. " +
-                            "Бронирования предыдущий и следующий, всего штук {}!", indicatorBookingList.size());
-
-                        return itemMapper.toItemDto(item).toBuilder()
-                                .lastBooking(indicatorBookingList.get(0))
-                                .nextBooking(indicatorBookingList.get(1))
-                                .build();
-
-                })
-                .collect(Collectors.toList()),Util.start(from,size));*/
         List<Item> itemList = getElementsFrom(itemRepository.findByOwnerId(userId,page),Util.start(from,size));
 
         List<Long> itemsId = itemList.stream().map(item -> item.getId()).collect(Collectors.toList());

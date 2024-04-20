@@ -231,17 +231,76 @@ class ShareItTests {
 	@Order(9)
 	@Test
 	void getItemsByUserId() {
+
 		userMapper.toUser(userService.addUser(userDtoList.get(0)));
 		userMapper.toUser(userService.addUser(userDtoList.get(1)));
+		userMapper.toUser(userService.addUser(userDtoList.get(2)));
 
-		itemService.addItem(itemDtoList.get(0),2);
+		itemService.addItem(itemDtoList.get(0),1);
 		itemService.addItem(itemDtoList.get(1),1);
 		itemService.addItem(itemDtoList.get(2),1);
 		itemService.addItem(itemDtoList.get(3),1);
+		itemService.addItem(itemDtoList.get(4),1);
 
-		printList(itemService.getItemsByUserId(2,0,10));
-		assertIterableEquals(List.of(2L,3L,4L),orderItemId(itemService.getItemsByUserId(1,0,10)));
-		assertIterableEquals(List.of(1L),orderItemId(itemService.getItemsByUserId(2,0,10)));
+		assertIterableEquals(List.of(1L,2L,3L,4L,5L),orderItemId(itemService.getItemsByUserId(1,0,10)));
+
+		//заказы на первую вещь, владелиц user 1
+		Booking booking1 = bookingService.addBooking(createBookingList.get(0), 3L);
+		bookingService.setStatus(booking1.getId(),1, true);
+		Booking booking2 = bookingService.addBooking(createBookingList.get(1), 3L);
+		bookingService.setStatus(booking2.getId(),1, true);
+		Booking booking3 = bookingService.addBooking(createBookingList.get(2), 3L);
+		bookingService.setStatus(booking3.getId(),1, true);
+		Booking booking4 = bookingService.addBooking(createBookingList.get(3), 3L);
+		bookingService.setStatus(booking4.getId(),1, true);
+		//заказы на вторую вещь, владелиц user 1
+		Booking booking5 = bookingService.addBooking(createBookingList.get(4).toBuilder().itemId(2L).build(), 3L);
+		bookingService.setStatus(booking5.getId(),1, true);
+		Booking booking6 = bookingService.addBooking(createBookingList.get(5).toBuilder().itemId(2L).build(), 3L);
+		bookingService.setStatus(booking6.getId(),1, true);
+		Booking booking7 = bookingService.addBooking(createBookingList.get(6).toBuilder().itemId(2L).build(), 3L);
+		bookingService.setStatus(booking7.getId(),1, false);
+		//заказы на третью вещь, владелиц user 1
+		Booking booking8 = bookingService.addBooking(createBookingList.get(7).toBuilder().itemId(3L).build(), 3L);
+		bookingService.setStatus(booking8.getId(),1, true);
+		Booking booking9 = bookingService.addBooking(createBookingList.get(8).toBuilder().itemId(3L).build(), 3L);
+		bookingService.setStatus(booking9.getId(),1, false);
+		Booking booking10 = bookingService.addBooking(createBookingList.get(9).toBuilder().itemId(3L).build(), 3L);
+		bookingService.setStatus(booking10.getId(),1, false);
+		//заказы на четвертую вещь, владелиц user 1
+		Booking booking11 = bookingService.addBooking(createBookingList.get(10).toBuilder().itemId(4L).build(), 3L);
+		//заказы на пятую вещь, владелиц user 1
+		Booking booking12 = bookingService.addBooking(createBookingList.get(11).toBuilder().itemId(5L).build(), 3L);
+		bookingService.setStatus(booking12.getId(),1, true);
+		Booking booking13 = bookingService.addBooking(createBookingList.get(12).toBuilder().itemId(5L).build(), 3L);
+		bookingService.setStatus(booking13.getId(),1, true);
+		Booking booking14 = bookingService.addBooking(createBookingList.get(13).toBuilder().itemId(5L).build(), 3L);
+		bookingService.setStatus(booking14.getId(),1, true);
+
+		List<ItemDto> itemDtoList1 = itemService.getItemsByUserId(1,0,10);
+
+		assertEquals(5,itemDtoList1.size());
+		assertEquals(itemDtoList1.get(0).getLastBooking().getId(),booking2.getId());
+		assertEquals(itemDtoList1.get(0).getLastBooking().getBookerId(),3);
+		assertEquals(itemDtoList1.get(0).getNextBooking().getId(),booking3.getId());
+		assertEquals(itemDtoList1.get(0).getNextBooking().getBookerId(),3);
+
+		assertEquals(itemDtoList1.get(1).getLastBooking().getId(),booking5.getId());
+		assertEquals(itemDtoList1.get(1).getLastBooking().getBookerId(),3);
+		assertEquals(itemDtoList1.get(1).getNextBooking().getId(),booking6.getId());
+		assertEquals(itemDtoList1.get(1).getNextBooking().getBookerId(),3);
+
+		assertEquals(itemDtoList1.get(2).getLastBooking().getId(),booking8.getId());
+		assertEquals(itemDtoList1.get(2).getLastBooking().getBookerId(),3);
+		assertNull(itemDtoList1.get(2).getNextBooking());
+
+		assertNull(itemDtoList1.get(3).getLastBooking());
+		assertNull(itemDtoList1.get(3).getNextBooking());
+
+		assertEquals(itemDtoList1.get(4).getLastBooking().getId(),booking12.getId());
+		assertEquals(itemDtoList1.get(4).getLastBooking().getBookerId(),3);
+		assertEquals(itemDtoList1.get(4).getNextBooking().getId(),booking13.getId());
+		assertEquals(itemDtoList1.get(4).getNextBooking().getBookerId(),3);
 	}
 
 	@Order(10)
@@ -705,57 +764,6 @@ class ShareItTests {
 				String.class);
 
 		assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, response4.getStatusCode());
-	}
-
-
-	@Test
-	void test() {
-		userMapper.toUser(userService.addUser(userDtoList.get(0)));
-		userMapper.toUser(userService.addUser(userDtoList.get(1)));
-		userMapper.toUser(userService.addUser(userDtoList.get(2)));
-
-		itemService.addItem(itemDtoList.get(0),1);
-		itemService.addItem(itemDtoList.get(1),1);
-		itemService.addItem(itemDtoList.get(2),1);
-		itemService.addItem(itemDtoList.get(3),1);
-		itemService.addItem(itemDtoList.get(4),1);
-
-		//заказы на первую вещь, владелиц user 1
-		Booking booking1 = bookingService.addBooking(createBookingList.get(0), 3L);
-		bookingService.setStatus(booking1.getId(),1, true);
-		Booking booking2 = bookingService.addBooking(createBookingList.get(1), 3L);
-		bookingService.setStatus(booking2.getId(),1, true);
-		Booking booking3 = bookingService.addBooking(createBookingList.get(2), 3L);
-		bookingService.setStatus(booking3.getId(),1, true);
-		Booking booking4 = bookingService.addBooking(createBookingList.get(3), 3L);
-		bookingService.setStatus(booking4.getId(),1, true);
-		//заказы на вторую вещь, владелиц user 1
-		Booking booking5 = bookingService.addBooking(createBookingList.get(4).toBuilder().itemId(2L).build(), 3L);
-		bookingService.setStatus(booking5.getId(),1, true);
-		Booking booking6 = bookingService.addBooking(createBookingList.get(5).toBuilder().itemId(2L).build(), 3L);
-		bookingService.setStatus(booking6.getId(),1, true);
-		Booking booking7 = bookingService.addBooking(createBookingList.get(6).toBuilder().itemId(2L).build(), 3L);
-		bookingService.setStatus(booking7.getId(),1, false);
-		//заказы на третью вещь, владелиц user 1
-		Booking booking8 = bookingService.addBooking(createBookingList.get(7).toBuilder().itemId(3L).build(), 3L);
-		bookingService.setStatus(booking8.getId(),1, true);
-		Booking booking9 = bookingService.addBooking(createBookingList.get(8).toBuilder().itemId(3L).build(), 3L);
-		bookingService.setStatus(booking9.getId(),1, false);
-		Booking booking10 = bookingService.addBooking(createBookingList.get(9).toBuilder().itemId(3L).build(), 3L);
-		bookingService.setStatus(booking10.getId(),1, false);
-		//заказы на четвертую вещь, владелиц user 1
-		Booking booking11 = bookingService.addBooking(createBookingList.get(10).toBuilder().itemId(4L).build(), 3L);
-		//заказы на пятую вещь, владелиц user 1
-		Booking booking12 = bookingService.addBooking(createBookingList.get(11).toBuilder().itemId(5L).build(), 3L);
-		bookingService.setStatus(booking12.getId(),1, true);
-		Booking booking13 = bookingService.addBooking(createBookingList.get(12).toBuilder().itemId(5L).build(), 3L);
-		bookingService.setStatus(booking13.getId(),1, true);
-		Booking booking14 = bookingService.addBooking(createBookingList.get(13).toBuilder().itemId(5L).build(), 3L);
-		bookingService.setStatus(booking14.getId(),1, true);
-
-		List<ItemDto> itemDtoList1 = itemService.getItemsByUserId(1,0,10);
-		printList(itemDtoList1);
-
 	}
 
 	private List<Long> orderBookingId(List<Booking> objects) {

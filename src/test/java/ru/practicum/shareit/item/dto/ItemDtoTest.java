@@ -100,4 +100,5 @@ class ItemDtoTest {
         assertThat(result).extractingJsonPathNumberValue("$.commentId").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.text").isEqualTo("коммент");
     }
+
 }

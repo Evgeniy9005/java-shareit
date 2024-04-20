@@ -3,11 +3,13 @@ package ru.practicum.shareit.booking.dao;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 public interface BookingRepository extends JpaRepository<Booking,Long> {
 
@@ -38,4 +40,15 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByBookingCurrentForOwner(long ownerId, LocalDateTime current, Pageable pageable);
 
     List<Booking> findByItemOwnerIdAndEndBeforeOrderByEndDesc(long ownerId, LocalDateTime past, Pageable pageable);
+
+    @Query("select b from Booking b where b.item.id in(:itemsId) and b.status = :status")
+    List<Booking> findByItemsIdBooking(@Param("itemsId") Set<Long> itemsId, @Param("status") Status status);
+
+/*    @Query("select b from Booking b left outer join " +
+            "(select b1.item.id, count(b1.item.id) c from Booking b1 group by b1.item.id) on b.item.id = b1.item.id " +
+            "where b.id in " +
+            "(select case " +
+            "when b1.c > 2 then select b.id from Booking b where b.item.id = b1.item.id order by b.start desc limit 1,1 " +
+            "when b1.c = 2 then select b.id from Booking b where b.item.id = b1.item.id order by b.start desc limit 1 end)")
+    List<Booking> findByLastNextBooking();*/
 }

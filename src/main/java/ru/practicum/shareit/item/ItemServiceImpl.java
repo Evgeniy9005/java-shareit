@@ -23,9 +23,11 @@ import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.util.Util;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.util.Util.getElementsFrom;
 
 @Slf4j
 @Service
@@ -99,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable page = Util.validPageParam(from,size);
 
-        return Util.getElementsFrom(itemRepository.findByOwnerId(userId,page).stream()
+        /*return Util.getElementsFrom(itemRepository.findByOwnerId(userId,page).stream()
                 .map(item -> {
                     List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
                             bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(
@@ -107,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
                     );
 
                     log.info("При возврате всех вещей пользователя. " +
-                            "Бронирования предэдущий и следующий, всего штук {}!", indicatorBookingList.size());
+                            "Бронирования предыдущий и следующий, всего штук {}!", indicatorBookingList.size());
 
                         return itemMapper.toItemDto(item).toBuilder()
                                 .lastBooking(indicatorBookingList.get(0))
@@ -115,7 +117,33 @@ public class ItemServiceImpl implements ItemService {
                                 .build();
 
                 })
-                .collect(Collectors.toList()),Util.start(from,size));
+                .collect(Collectors.toList()),Util.start(from,size));*/
+        List<Item> itemList = getElementsFrom(itemRepository.findByOwnerId(userId,page),Util.start(from,size));
+
+        Set<Long> itemsId = itemList.stream().map(item -> item.getId()).collect(Collectors.toSet());
+
+        List<Booking> bookingList = bookingRepository.findByItemsIdBooking(itemsId,Status.APPROVED);
+
+        Map<Long,List<Booking>> itemsBookingMap = bookingList.stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
+
+        return itemList.stream().map(item -> {
+            long itemId = item.getId();
+            if (itemsBookingMap.containsKey(itemId)) {
+                List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
+                        itemsBookingMap.get(itemId)
+                );
+
+            log.info("При возврате всех вещей пользователя. " +
+                    "Бронирования предыдущий и следующий, всего штук {}!", indicatorBookingList.size());
+
+            return itemMapper.toItemDto(item).toBuilder()
+                    .lastBooking(indicatorBookingList.get(0))
+                    .nextBooking(indicatorBookingList.get(1))
+                    .build();
+            }
+            return itemMapper.toItemDto(item);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -166,7 +194,7 @@ public class ItemServiceImpl implements ItemService {
 
         Pageable page = Util.validPageParam(from,size);
 
-        return Util.getElementsFrom(
+        return getElementsFrom(
                 itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text,page).stream()
                 .map(item -> itemMapper.toItemDto(item))
                 .collect(Collectors.toList()), Util.start(from,size)
@@ -240,6 +268,7 @@ public class ItemServiceImpl implements ItemService {
         indicatorBookingList.add(lastBooking);
         indicatorBookingList.add(nextBooking);
         return indicatorBookingList;
+
     }
 }
 

@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.data.Data;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.util.Util;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,5 +250,10 @@ class BookingRepositoryTest {
 
     private List<Long> bookingsId(List<Booking> bookingList) {
         return bookingList.stream().map(booking -> booking.getId()).collect(Collectors.toList());
+    }
+
+    @Test
+    void findByItemsIdBooking() {
+       printList(bookingRepository.findByItemsIdBooking(Set.of(1L),Status.APPROVED));
     }
 }

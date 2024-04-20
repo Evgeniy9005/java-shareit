@@ -707,6 +707,40 @@ class ShareItTests {
 		assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, response4.getStatusCode());
 	}
 
+
+	@Test
+	void test() {
+		userMapper.toUser(userService.addUser(userDtoList.get(0)));
+		userMapper.toUser(userService.addUser(userDtoList.get(1)));
+		userMapper.toUser(userService.addUser(userDtoList.get(2)));
+
+		itemService.addItem(itemDtoList.get(0),1);
+		itemService.addItem(itemDtoList.get(1),1);
+		itemService.addItem(itemDtoList.get(2),1);
+		itemService.addItem(itemDtoList.get(3),2);
+		itemService.addItem(itemDtoList.get(4),2);
+
+		//заказы на первую вещь, владелиц user 1
+		bookingService.addBooking(createBookingList.get(0), 3L);
+		bookingService.addBooking(createBookingList.get(1), 3L);
+		bookingService.addBooking(createBookingList.get(2), 3L);
+		//заказы на вторую вещь, владелиц user 1
+		bookingService.addBooking(createBookingList.get(3).toBuilder().itemId(2L).build(), 3L);
+		bookingService.addBooking(createBookingList.get(4).toBuilder().itemId(2L).build(), 3L);
+		bookingService.addBooking(createBookingList.get(5).toBuilder().itemId(2L).build(), 3L);
+		//заказы на третью вещь, владелиц user 1
+		bookingService.addBooking(createBookingList.get(6).toBuilder().itemId(3L).build(), 3L);
+		bookingService.addBooking(createBookingList.get(7).toBuilder().itemId(3L).build(), 3L);
+		bookingService.addBooking(createBookingList.get(8).toBuilder().itemId(3L).build(), 3L);
+
+		/*List<Booking> bookingList = bookingService.getBookingsForBooker(3,ALL,0,10);
+		printList(bookingList);*/
+
+		List<ItemDto> itemDtoList1 = itemService.getItemsByUserId(1,0,10);
+		printList(itemDtoList1);
+
+	}
+
 	private List<Long> orderBookingId(List<Booking> objects) {
 		return objects.stream().map(b -> b.getId()).collect(Collectors.toList());
 	}

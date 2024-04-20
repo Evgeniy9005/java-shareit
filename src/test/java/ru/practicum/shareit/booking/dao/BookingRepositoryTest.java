@@ -254,6 +254,6 @@ class BookingRepositoryTest {
 
     @Test
     void findByItemsIdBooking() {
-       printList(bookingRepository.findByItemsIdBooking(Set.of(1L),Status.APPROVED));
+       printList(bookingRepository.findByItemsIdBooking(List.of(1L),Status.APPROVED));
     }
 }

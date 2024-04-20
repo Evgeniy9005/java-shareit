@@ -21,10 +21,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.util.Util;
-
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.util.Util.getElementsFrom;
@@ -120,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList()),Util.start(from,size));*/
         List<Item> itemList = getElementsFrom(itemRepository.findByOwnerId(userId,page),Util.start(from,size));
 
-        Set<Long> itemsId = itemList.stream().map(item -> item.getId()).collect(Collectors.toSet());
+        List<Long> itemsId = itemList.stream().map(item -> item.getId()).collect(Collectors.toList());
 
         List<Booking> bookingList = bookingRepository.findByItemsIdBooking(itemsId,Status.APPROVED);
 
@@ -159,7 +157,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException("Не найдена вешь под id = " + itemId)
+                () -> new NotFoundException("Не найдена вещь под id = " + itemId)
         );
 
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
@@ -167,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
                         .findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
         );
 
-        log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());
+        log.info("Бронирования предыдущий и следующий, всего штук {}", indicatorBookingList.size());
 
         List<CommentDto> commentsDto = commentMapper.toCommentDtoList(
                 commentRepository.findByItemId(itemId)
@@ -206,15 +204,15 @@ public class ItemServiceImpl implements ItemService {
 
         if (!bookingRepository
                 .existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
-          throw new BadRequestException("У пользователя # небыло вещи # в аренде!",itemId,authorId);
+          throw new BadRequestException("У пользователя # не было вещи # в аренде!",itemId,authorId);
         }
 
         Comment comment = Comment.builder()
                 .text(createCommentDto.getText())
                 .item(itemRepository.findById(itemId).orElseThrow(
-                        () -> new NotFoundException("Не найдена вещь #, при добовлении коментария",itemId)))
+                        () -> new NotFoundException("Не найдена вещь #, при добавлении комментария",itemId)))
                 .author(userRepository.findById(authorId).orElseThrow(
-                        () -> new NotFoundException("Не найден пользователь #, при добовлении коментария",authorId)))
+                        () -> new NotFoundException("Не найден пользователь #, при добавлении комментария",authorId)))
                 .created(LocalDateTime.now())
                 .build();
 
@@ -234,6 +232,8 @@ public class ItemServiceImpl implements ItemService {
         if (bookingsList == null) {
             return indicatorBookingList;
         }
+
+        bookingsList.sort((b1,b2) -> b1.getStart().compareTo(b2.getStart()));
 
         int size = bookingsList.size();
 

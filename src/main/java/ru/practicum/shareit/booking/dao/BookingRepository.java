@@ -42,7 +42,7 @@ public interface BookingRepository extends JpaRepository<Booking,Long> {
     List<Booking> findByItemOwnerIdAndEndBeforeOrderByEndDesc(long ownerId, LocalDateTime past, Pageable pageable);
 
     @Query("select b from Booking b where b.item.id in(:itemsId) and b.status = :status")
-    List<Booking> findByItemsIdBooking(@Param("itemsId") Set<Long> itemsId, @Param("status") Status status);
+    List<Booking> findByItemsIdBooking(@Param("itemsId") List<Long> itemsId, @Param("status") Status status);
 
 /*    @Query("select b from Booking b left outer join " +
             "(select b1.item.id, count(b1.item.id) c from Booking b1 group by b1.item.id) on b.item.id = b1.item.id " +

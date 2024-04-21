@@ -130,8 +130,7 @@ class ItemServiceImplTest {
         itemService.getItemsByUserId(1,0,10);
 
         verify(itemRepository).findByOwnerId(anyLong(),any());
-        verify(bookingRepository,times(2))
-                .findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(anyLong(),anyLong(), any());
+        verify(bookingRepository).findByItemsIdBooking(any(), any());
 
     }
 

@@ -69,7 +69,7 @@ class ItemRepositoryTest {
 
         Data.<Item>generationData(3,Item.class,savedUser.get(1),1L)
                 .stream()
-                .map(item -> savedItems.add(itemRepository.save(item.toBuilder().id(0).build())))
+                .map(item -> savedItems.add(itemRepository.save(item.toBuilder().id(0).request(2L).build())))
                 .collect(Collectors.toList());
         Data.printList(savedItems,"_=_");
 
@@ -105,7 +105,11 @@ class ItemRepositoryTest {
     @Test
     void findByRequest() {
       List<Item> itemList = itemRepository.findByRequest(1L);
-      assertEquals(8,itemList.size());
+      assertEquals(5,itemList.size());
+      assertEquals(3,itemRepository.findByRequest(2L).size());
+      assertEquals(8,itemRepository.findByRequest(List.of(1L,2L)).size());
+      assertEquals(5,itemRepository.findByRequest(List.of(1L)).size());
+      assertEquals(3,itemRepository.findByRequest(List.of(2L)).size());
     }
 
     @Test

@@ -125,10 +125,8 @@ class ItemRequestServiceImplTest {
 
         verify(itemRequestRepository,times(2)).existsByRequester(1);
         verify(itemRequestRepository).findAll(pageable);
-        verify(itemRepository).findByRequest(1);
-        verify(itemRepository).findByRequest(2);
-        verify(itemRepository).findByRequest(3);
-        verify(itemRepository,times(3)).findByRequest(anyLong());
+        verify(itemRepository).findByRequest(List.of(1L,2L,3L));
+        verify(itemRepository).findByRequest(any());
     }
 
     @Test

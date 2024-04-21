@@ -55,7 +55,7 @@ public class Util {
     private static void validFromSize(int from, int size) {
         if (from < 0 || size < 1) {
             throw new BadRequestException(
-                    "Не верно заданы входные параметры для отображения данных в диапозоне от # до #  ", from, size);
+                    "Не верно заданы входные параметры для отображения данных в диапазоне от # до #  ", from, size);
         }
     }
 

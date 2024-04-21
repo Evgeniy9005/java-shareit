@@ -28,7 +28,6 @@ public class ItemController {
                           @PathVariable Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
-
        return itemService.upItem(
                 Patch.patchItemDto(itemService.getItem(itemId, userId), itemDto),
                 itemId,
@@ -48,7 +47,6 @@ public class ItemController {
                                                 @RequestParam(defaultValue = "0") Integer from,
                                                 @RequestParam(defaultValue = "10") Integer size
     ) {
-
         return itemService.getItemsByUserId(userId, from, size);
     }
 

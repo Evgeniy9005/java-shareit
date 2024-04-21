@@ -24,7 +24,6 @@ public class BookingController {
     public BookingDto addBooking(@RequestBody @Valid CreateBooking createBooking,
                                  @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
-
         return mapper.toBookingDto(bookingService.addBooking(createBooking, userId));
     }
 
@@ -48,9 +47,8 @@ public class BookingController {
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "default") String state,
             @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size
+            @RequestParam (defaultValue = "10") Integer size
     ) {
-
         return mapper.toBookingDtoList(bookingService.getBookingsForBooker(userId,state,from,size));
     }
 
@@ -61,8 +59,6 @@ public class BookingController {
             @RequestParam(defaultValue = "0") Integer from,
             @RequestParam(defaultValue = "10") Integer size
     ) {
-
         return mapper.toBookingDtoList(bookingService.getBookingsOwnerState(userId, state, from, size));
-
     }
 }

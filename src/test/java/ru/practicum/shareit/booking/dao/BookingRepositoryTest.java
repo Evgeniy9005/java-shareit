@@ -8,8 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.data.Data;
@@ -21,7 +19,6 @@ import ru.practicum.shareit.util.Util;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -248,12 +245,17 @@ class BookingRepositoryTest {
         assertEquals(List.of(8L,7L,6L,5L,4L,3L,2L,1L),bookingsId(bookingList));
     }
 
-    private List<Long> bookingsId(List<Booking> bookingList) {
-        return bookingList.stream().map(booking -> booking.getId()).collect(Collectors.toList());
-    }
-
     @Test
     void findByItemsIdBooking() {
-       printList(bookingRepository.findByItemsIdBooking(List.of(1L),Status.APPROVED));
+      List<Booking> bookings1 = bookingRepository.findByItemsIdBooking(List.of(1L,2L,3L),Status.APPROVED);
+      assertEquals(11,bookings1.size());
+      List<Booking> bookings2 = bookingRepository.findByItemsIdBooking(List.of(2L),Status.APPROVED);
+      assertEquals(8,bookings2.size());
+      List<Booking> bookings3 = bookingRepository.findByItemsIdBooking(List.of(1L,3L),Status.APPROVED);
+      assertEquals(3,bookings3.size());
+    }
+
+    private List<Long> bookingsId(List<Booking> bookingList) {
+        return bookingList.stream().map(booking -> booking.getId()).collect(Collectors.toList());
     }
 }

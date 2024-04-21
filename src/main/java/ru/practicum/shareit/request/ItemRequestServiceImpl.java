@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemRepository;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dao.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.CreateItemRequest;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.util.Util;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,10 +60,22 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
         List<ItemRequest> itemRequestList = repository.findByRequester(userId);
 
+        List<Long> itemRequestsId = itemRequestList.stream().map(ItemRequest::getId).collect(Collectors.toList());
+
+        List<Item> itemList = itemRepository.findByRequest(itemRequestsId);
+
+        Map<Long,List<Item>> itemsOnRequestMap = itemList.stream().collect(Collectors.groupingBy(Item::getRequest));
+
         List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(itemRequestList).stream()
-                .map(itemRequestDto -> itemRequestDto.toBuilder()
-                        .items(itemMapper.toItemDtoList(itemRepository.findByRequest(itemRequestDto.getId())))
-                        .build())
+                .map(itemRequestDto -> {
+                    long idItemRequest = itemRequestDto.getId();
+                    if (itemsOnRequestMap.containsKey(idItemRequest)) {
+                        return itemRequestDto.toBuilder()
+                                .items(itemMapper.toItemDtoList(itemsOnRequestMap.get(idItemRequest)))
+                                .build();
+                    }
+                    return itemRequestDto;
+                })
                 .collect(Collectors.toList());
 
         return itemRequestDtoList;
@@ -85,10 +99,22 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
             log.info("Получены все ItemRequest в количестве {} в диапазоне от {} до {}",requests.size(),from,size);
 
+            List<Long> itemRequestsId = requests.stream().map(ItemRequest::getId).collect(Collectors.toList());
+
+            List<Item> itemList = itemRepository.findByRequest(itemRequestsId);
+
+            Map<Long,List<Item>> itemsOnRequestMap = itemList.stream().collect(Collectors.groupingBy(Item::getRequest));
+
             List<ItemRequestDto> itemRequestDtoList = mapper.toItemRequestDtoList(requests).stream()
-                    .map(itemRequestDto -> itemRequestDto.toBuilder()
-                            .items(itemMapper.toItemDtoList(itemRepository.findByRequest(itemRequestDto.getId())))
-                            .build())
+                    .map(itemRequestDto -> {
+                        long idItemRequest = itemRequestDto.getId();
+                        if (itemsOnRequestMap.containsKey(idItemRequest)) {
+                            return itemRequestDto.toBuilder()
+                                    .items(itemMapper.toItemDtoList(itemsOnRequestMap.get(idItemRequest)))
+                                    .build();
+                        }
+                        return itemRequestDto;
+                    })
                     .collect(Collectors.toList());
 
             log.info("Получены все ItemRequestDto в количестве {} в диапазоне от {} до {}",

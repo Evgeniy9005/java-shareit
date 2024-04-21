@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +11,8 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.patch.Patch;
 import ru.practicum.shareit.user.dao.UserRepository;
 import ru.practicum.shareit.user.dto.UserDto;
-
-import java.util.Collection;
+import ru.practicum.shareit.util.Util;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -75,13 +76,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Collection<UserDto> getUsers() {
+    public List<UserDto> getUsers(int from, int size) {
 
         Sort sortById = Sort.by(Sort.Direction.ASC,"id");
 
-        Collection<UserDto> set = userRepository.findAll(sortById).stream()
+        Pageable page = Util.validPageParam(from,size,sortById);
+
+        List<UserDto> set = Util.getElementsFrom(userRepository.findAll(page).stream()
                 .map(user -> userMapper.toUserDto(user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()),Util.start(from,size));
 
         log.info("Возвращены все пользователи в количестве " + set.size());
 

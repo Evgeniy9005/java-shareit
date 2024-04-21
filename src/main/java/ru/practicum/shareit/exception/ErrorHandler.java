@@ -19,14 +19,6 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handle(final ValidException e) {
-        log.debug("Получен статус 409 conflict {}",e.getMessage(),e);
-        return new ErrorResponse(
-                e.getClass().getName(), e.getMessage()
-        );
-    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)

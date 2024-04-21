@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -19,12 +20,12 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dao.UserRepository;
-
+import ru.practicum.shareit.util.Util;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.util.Util.getElementsFrom;
 
 @Slf4j
 @Service
@@ -51,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
                 itemMapper.toItem(itemDto.toBuilder().owner(
                         userRepository.findById(userId).orElseThrow(
                                 () -> new NotFoundException(
-                                        "при добовлении вещи не найден пользователь под id = " + userId))
+                                        "При добовлении вещи не найден пользователь под id = " + userId))
                 ).build())
         );
 
@@ -86,35 +87,44 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Не найдена вещь под id = " + itemId));
 
-
-
         log.info("Вернулась вещь {}, пользователя {}", item, userId);
 
         return itemMapper.toItemDto(item);
     }
 
     @Override
-    public Collection<ItemDto> getItemsByUserId(long userId) {
+    public List<ItemDto> getItemsByUserId(long userId, int from, int size) {
 
         log.info("Вернуть все вещи пользователя {}", userId);
 
-        return itemRepository.findByOwnerId(userId).stream()
-                .map(item -> {
-                    List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
-                            bookingRepository.findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(
-                                            item.getId(),userId,Status.APPROVED)
-                    );
+        Pageable page = Util.validPageParam(from,size);
 
-                    log.info("При возврате всех вещей пользователя. " +
-                            "Бронирования предэдущий и следующий, всего штук {}!", indicatorBookingList.size());
+        List<Item> itemList = getElementsFrom(itemRepository.findByOwnerId(userId,page),Util.start(from,size));
 
-                        return itemMapper.toItemDto(item).toBuilder()
-                                .lastBooking(indicatorBookingList.get(0))
-                                .nextBooking(indicatorBookingList.get(1))
-                                .build();
+        List<Long> itemsId = itemList.stream().map(item -> item.getId()).collect(Collectors.toList());
 
-                })
-                .collect(Collectors.toList());
+        List<Booking> bookingList = bookingRepository.findByItemsIdBooking(itemsId,Status.APPROVED);
+
+        Map<Long,List<Booking>> itemsBookingMap = bookingList.stream()
+                .collect(Collectors.groupingBy(booking -> booking.getItem().getId()));
+
+        return itemList.stream().map(item -> {
+            long itemId = item.getId();
+            if (itemsBookingMap.containsKey(itemId)) {
+                List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
+                        itemsBookingMap.get(itemId)
+                );
+
+            log.info("При возврате всех вещей пользователя. " +
+                    "Бронирования предыдущий и следующий, всего штук {}!", indicatorBookingList.size());
+
+            return itemMapper.toItemDto(item).toBuilder()
+                    .lastBooking(indicatorBookingList.get(0))
+                    .nextBooking(indicatorBookingList.get(1))
+                    .build();
+            }
+            return itemMapper.toItemDto(item);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -130,7 +140,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new NotFoundException("Не найдена вешь под id = " + itemId)
+                () -> new NotFoundException("Не найдена вещь под id = " + itemId)
         );
 
         List<IndicatorBooking> indicatorBookingList = setIndicatorBooking(
@@ -138,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
                         .findByItemIdAndItemOwnerIdAndStatusOrderByStartAsc(itemId,userIdMakesRequest,Status.APPROVED)
         );
 
-        log.info("Бронирования предэдущий и следующий, всего штук {}", indicatorBookingList.size());
+        log.info("Бронирования предыдущий и следующий, всего штук {}", indicatorBookingList.size());
 
         List<CommentDto> commentsDto = commentMapper.toCommentDtoList(
                 commentRepository.findByItemId(itemId)
@@ -155,7 +165,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> search(String text, long userId) {
+    public List<ItemDto> search(String text, long userId, int from, int size) {
 
         log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
 
@@ -163,9 +173,13 @@ public class ItemServiceImpl implements ItemService {
         return new ArrayList<>(0);
         }
 
-        return itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text).stream()
+        Pageable page = Util.validPageParam(from,size);
+
+        return getElementsFrom(
+                itemRepository.searchByIgnoreCaseDescriptionContainingAndAvailableTrue(text,page).stream()
                 .map(item -> itemMapper.toItemDto(item))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), Util.start(from,size)
+        );
     }
 
 
@@ -173,15 +187,15 @@ public class ItemServiceImpl implements ItemService {
 
         if (!bookingRepository
                 .existsByItemIdAndBookerIdAndStatusAndEndBefore(itemId,authorId,Status.APPROVED,LocalDateTime.now())) {
-          throw new BadRequestException("У пользователя небыло вещи # в аренде!",itemId);
+          throw new BadRequestException("У пользователя # не было вещи # в аренде!",itemId,authorId);
         }
 
         Comment comment = Comment.builder()
                 .text(createCommentDto.getText())
                 .item(itemRepository.findById(itemId).orElseThrow(
-                        () -> new NotFoundException("Не найдена вещь #, при добовлении коментария",itemId)))
+                        () -> new NotFoundException("Не найдена вещь #, при добавлении комментария",itemId)))
                 .author(userRepository.findById(authorId).orElseThrow(
-                        () -> new NotFoundException("Не найден пользователь #, при добовлении коментария",authorId)))
+                        () -> new NotFoundException("Не найден пользователь #, при добавлении комментария",authorId)))
                 .created(LocalDateTime.now())
                 .build();
 
@@ -201,6 +215,8 @@ public class ItemServiceImpl implements ItemService {
         if (bookingsList == null) {
             return indicatorBookingList;
         }
+
+        bookingsList.sort((b1,b2) -> b1.getStart().compareTo(b2.getStart()));
 
         int size = bookingsList.size();
 
@@ -235,6 +251,7 @@ public class ItemServiceImpl implements ItemService {
         indicatorBookingList.add(lastBooking);
         indicatorBookingList.add(nextBooking);
         return indicatorBookingList;
+
     }
 }
 

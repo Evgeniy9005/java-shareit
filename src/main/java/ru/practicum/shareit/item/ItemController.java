@@ -14,6 +14,7 @@ import java.util.Collection;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
+
     private final ItemService itemService;
 
     @PostMapping
@@ -27,7 +28,6 @@ public class ItemController {
                           @PathVariable Long itemId,
                           @RequestHeader("X-Sharer-User-Id") Long userId
     ) {
-
        return itemService.upItem(
                 Patch.patchItemDto(itemService.getItem(itemId, userId), itemDto),
                 itemId,
@@ -43,17 +43,21 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
-
-        return itemService.getItemsByUserId(userId);
+    public Collection<ItemDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                @RequestParam(defaultValue = "0") Integer from,
+                                                @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return itemService.getItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
     public Collection<ItemDto> search(@RequestParam String text,
-                                      @RequestHeader("X-Sharer-User-Id") Long userId
+                                      @RequestHeader("X-Sharer-User-Id") Long userId,
+                                      @RequestParam(defaultValue = "0") Integer from,
+                                      @RequestParam(defaultValue = "10") Integer size
     ) {
 
-        return itemService.search(text,userId);
+        return itemService.search(text,userId,from,size);
     }
 
     @PostMapping("/{itemId}/comment")

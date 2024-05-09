@@ -21,9 +21,6 @@ public interface ItemMapper {
     @Mapping(target = "owner", expression = "java(userToUserDto(item))")
     ItemDto toItemDto(Item item);
 
-  /*  @Mapping(target = "requestId", source = "item.request")
-    List<ItemDto> toItemDtoList(List<Item> items);*/
-
     default List<ItemDto> toItemDtoList(List<Item> items) {
         return items.stream().map(item -> toItemDto(item)).collect(Collectors.toList());
     }

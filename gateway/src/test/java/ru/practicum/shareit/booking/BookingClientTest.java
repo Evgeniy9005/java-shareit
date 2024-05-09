@@ -4,20 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.CreateBooking;
-import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +32,7 @@ class BookingClientTest {
     void start() {
 
         restTemplateBuilder
-                .uriTemplateHandler(new DefaultUriBuilderFactory( "http://localhost:9090/bookings"))
+                .uriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9090/bookings"))
                 .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                 .build();
 

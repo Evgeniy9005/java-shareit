@@ -8,11 +8,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.patch.Patch;
 import ru.practicum.shareit.user.dto.UserDto;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
+
 
 @Controller
 @RequestMapping(path = "/users")

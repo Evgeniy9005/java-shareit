@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static ru.practicum.shareit.data.Data.START_DATE;
+
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceImplTest {

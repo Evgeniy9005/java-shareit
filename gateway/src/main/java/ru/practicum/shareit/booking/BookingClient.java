@@ -86,7 +86,7 @@ public class BookingClient extends BaseClient {
         }
 
         if (start.compareTo(LocalDateTime.now()) < 0) {
-            throw new BadRequestException( String.format("Время начала %s бронирования не может быть в прошлом!",start));
+            throw new BadRequestException(String.format("Время начала %s бронирования не может быть в прошлом!",start));
         }
     }
 }

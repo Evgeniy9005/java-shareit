@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.data.Data;
 import ru.practicum.shareit.user.dto.UserDto;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

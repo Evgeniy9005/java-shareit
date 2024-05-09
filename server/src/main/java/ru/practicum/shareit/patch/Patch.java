@@ -4,7 +4,6 @@ import ru.practicum.shareit.item.booking.IndicatorBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
 
 public class Patch {
 

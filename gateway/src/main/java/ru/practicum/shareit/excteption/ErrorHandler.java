@@ -10,15 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-   /* @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final NotFoundException e) {
-        log.debug("Получен статус 404 Not found {}",e.getMessage(),e);
-        return new ErrorResponse(
-                e.getClass().getName(), e.getMessage()
-        );
-    }*/
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final BadRequestException e) {
@@ -27,6 +18,7 @@ public class ErrorHandler {
                 e.getClass().getName(), e.getMessage()
         );
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final UnsupportedStatusException e) {

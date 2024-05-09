@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CreateCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.patch.Patch;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Collection;
+
 
 @Controller
 @RequestMapping(path = "/items")

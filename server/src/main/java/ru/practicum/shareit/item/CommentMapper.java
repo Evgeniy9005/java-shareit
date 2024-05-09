@@ -18,8 +18,6 @@ public interface CommentMapper {
         return comment.getAuthor().getName();
     }
 
-   // List<CommentDto> toCommentDtoList(List<Comment> comments);
-
     default List<CommentDto> toCommentDtoList(List<Comment> comments) {
         return comments.stream().map(comment -> toCommentDto(comment)).collect(Collectors.toList());
     }

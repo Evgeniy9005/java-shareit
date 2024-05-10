@@ -1,18 +1,17 @@
 version: '3.8'
 services:
   gateway:
-    build: shareit-gateway
+    build: gateway
     image: shareit-gateway-image
     container_name: shareit-gateway-container
     ports:
-     - "8080:8080"
+      - "8080:8080"
     depends_on:
-     - server
+      - server
     environment:
-     - SHAREIT_SERVER_URL=http://server:9090
-
+      - SHAREIT_SERVER_URL=http://server:9090
   server:
-    build: shareit-server
+    build: server
     image: shareit-server-image
     container_name: shareit-server-container
     ports:
@@ -20,14 +19,15 @@ services:
     depends_on:
       - db
     environment:
-     # - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
+      - INIT_SCHEMA=classpath*:schema_postgres.sql
+      - INIT_DATA=classpath*:data_postgres.sql
       - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQL10Dialect
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - SPRING_DATASOURCE_USERNAME=evgeniy
       - SPRING_DATASOURCE_PASSWORD=evgeniy
   db:
-    image: postgres:16-alpine
+    image: postgres:14-alpine
     container_name: shareit-db-container
     ports:
       - "6541:5432"
@@ -35,3 +35,6 @@ services:
       - POSTGRES_PASSWORD=evgeniy
       - POSTGRES_USER=evgeniy
       - POSTGRES_DB=shareit
+    volumes:
+      - .:/docker-entrypoint-initdb.d
+     # - .:/data

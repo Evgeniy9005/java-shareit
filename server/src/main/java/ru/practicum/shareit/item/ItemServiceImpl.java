@@ -66,10 +66,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto upItem(ItemDto itemDto, long itemId, long userId) {
 
-        if (userId <= 0) {
-            throw new BadRequestException("Не коректный id пользователя = " + userId);
-        }
-
         if (itemDto.getOwner().getId() != userId) {
             throw new NotFoundException("Не владелец этой вещи пользователь под id " + userId);
         }
@@ -170,10 +166,6 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String text, long userId, int from, int size) {
 
         log.info("Поиск вещей по тексту {}, по запросу пользователя {}", text, userId);
-
-        if (text.isBlank()) {
-        return new ArrayList<>(0);
-        }
 
         Pageable page = Util.createPageParam(from,size);
 

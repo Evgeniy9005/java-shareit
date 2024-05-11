@@ -34,8 +34,6 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public Booking addBooking(CreateBooking createBooking, Long userId) {
 
-   // validDate(createBooking);
-
     Item item = itemRepository.findById(createBooking.getItemId())
             .orElseThrow(() -> new NotFoundException("Не найдена, при бронировании вещь!"));
 
@@ -66,10 +64,6 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public Booking setStatus(long bookingId, long userId, Boolean approved) {
-
-        if (approved == null) {
-            throw new BadRequestException("Не определен статус одобрения вещи на бронирование!");
-        }
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Не найдено бронирование под id = " + bookingId));

@@ -35,6 +35,9 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> setStatus(Long bookingId, Long userId, Boolean approved) {
+        if (approved == null) {
+            throw new BadRequestException("Не определен статус одобрения вещи на бронирование!");
+        }
         Map<String, Object> parameters = Map.of(
                 "bookingId", bookingId,
                 "approved", approved

@@ -32,7 +32,8 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public ResponseEntity<Object> upUser(@RequestBody UserDto userDto,
-                                         @Positive @PathVariable Long userId
+                                         @Positive(message = "Не корректный id пользователя!")
+                                         @PathVariable Long userId
     ) {
         log.info("Обновление пользователя {}",userId);
         return userClient.upUser(Patch.patchUserDto(userDto),userId);

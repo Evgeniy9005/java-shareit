@@ -52,10 +52,6 @@ class BookingDtoTest {
                 .end(end)
                 .build();
 
-        ItemDto item = bookingDto.getItem();
-
-        UserDto booker = bookingDto.getBooker();
-
         JsonContent<BookingDto> result = jacksonTester.write(bookingDto);
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);

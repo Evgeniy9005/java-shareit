@@ -97,8 +97,6 @@ class ItemServiceImplTest {
 
     @Test
     void upItem() {
-        assertThrows(BadRequestException.class,() -> itemService.upItem(itemDtoList.get(0),1,-1),
-                "Не коректный id пользователя = -1");
 
         assertThrows(NotFoundException.class,() -> itemService.upItem(itemDtoList.get(0),1,2),
                 "Не владелец этой вещи пользователь под id 2");
@@ -152,10 +150,6 @@ class ItemServiceImplTest {
 
     @Test
     void search() {
-
-        assertIterableEquals(List.of(),itemService.search("",1,0,10));
-
-        verify(itemRepository,never()).searchByIgnoreCaseDescriptionContainingAndAvailableTrue(anyString(),any());
 
         Pageable pageable = Util.createPageParam(0,10);
 

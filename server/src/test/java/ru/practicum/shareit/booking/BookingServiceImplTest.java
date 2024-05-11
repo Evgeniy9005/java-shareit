@@ -170,9 +170,6 @@ class BookingServiceImplTest {
         when(bookingRepository.findById(anyLong()))
                 .thenReturn(Optional.of(bookingList.get(0).toBuilder().status(Status.WAITING).build()));
 
-        assertThrows(BadRequestException.class,() -> bookingService.setStatus(1L,1L,null),
-                "Не определен статус одобрения вещи на бронирование!");
-
         assertThrows(NotFoundException.class,() -> bookingService.setStatus(1L,1L,true),
                 "Бронирующий 1 может только отменить бронь!");
 
